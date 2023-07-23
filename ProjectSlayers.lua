@@ -8,6 +8,9 @@ local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
+local current_tween
+local noclip_tween
+
 local camera = workspace.CurrentCamera
 
 local function onCharacterAdded(character)
@@ -21,6 +24,14 @@ local function onCharacterRemoved()
     -- This function will be called whenever the player's character is removed (e.g., on death)
     Character = nil
 end
+
+task.spawn(function()
+    while task.wait() do
+        if noclip_tween then
+            Character:WaitForChild("Humanoid"):ChangeState(11)
+        end
+    end
+end)
 
 LocalPlayer.CharacterRemoving:Connect(onCharacterRemoved)
 -- Main Menu
@@ -242,6 +253,12 @@ if game.PlaceId == 5956785391 then
                         
                         return Namecall(self, ...)
                     end)
+
+                    _G.Options ={
+                        TweenSpeed = 120,
+                        infstam = false,
+                        infbreath = false,
+                    }
                     
                     local hook
                     hook = hookmetamethod(game, "__namecall", function(self, ...)
@@ -707,7 +724,7 @@ if game.PlaceId == 5956785391 then
         end
         
         local universalGodMode = miscellaneousTab:CreateToggle({
-            Name = "Universal God Mode [Requires Scythe Equipped/ 30+ Mas.]",
+            Name = "Universal God Mode [Requires Scythe Equipped/ 28+ Mas.]",
             CurrentValue = false,
             Callback = function(Value)
                 if Value then
@@ -718,49 +735,41 @@ if game.PlaceId == 5956785391 then
             end
         })
         
-        -- [INF Breathing/Stamina]
-        local infBreathingEnabled = false
         local infBreathingToggle = miscellaneousTab:CreateToggle({
             Name = "INF Breathing",
             CurrentValue = false,
             Callback = function (Value)
-                infBreathingEnabled = (Value)
+                _G.Options.infbreath = (Value)
             end
         })
         
-        -- It's better to create a local reference to getrenv()._G for better performance.
-        local _G = getrenv()._G
-        
         spawn(function()
             while task.wait() do
-                if infBreathingEnabled then
-                    _G.infbreath = true
-                    _G:Breath(-100) -- The function to reduce breathing is _G:Breath(-100)
+                if _G.Options.infbreath then
+                    getrenv()._G:Breath(-100)
                 else
-                    _G.infbreath = false
+                    _G.Options.infbreath = false
                 end
             end
         end)
         
-        local infStaminaEnabled = false
         local infStamToggle = miscellaneousTab:CreateToggle({
             Name = "INF Stamina",
             CurrentValue = false,
             Callback = function (Value)
-                infStaminaEnabled = (Value)
+                _G.Options.infstam = (Value)
             end
         })
         
         spawn(function()
             while task.wait() do
-                if infStaminaEnabled then
-                    _G.infstam = true
-                    _G:Stamina(-100) -- The function to reduce stamina is _G:Stamina(-100)
+                if _G.Options.infstam then
+                    getrenv()._G:Stamina(-100)
                 else
-                    _G.infstam = false
+                    _G.Options.infstam = false
                 end
             end
-        end)       
+        end)
 
    -- [ESP]
    local ESP = Window:CreateTab("ESP")
@@ -895,6 +904,24 @@ if game.PlaceId == 5956785391 then
         -- [Teleport Section]
         local Teleport = Window:CreateTab("Teleport")
         local TeleportSection = Teleport:CreateSection("Teleport")
+
+        function TeleportTween(dist, AdditionalCFrame)
+            if Character:FindFirstChild("HumanoidRootPart") and Character:FindFirstChild("Humanoid") then
+                if AdditionalCFrame then
+                    local tweenInfo = TweenInfo.new((Character:WaitForChild("HumanoidRootPart").Position - dist.Position).magnitude / _G.Options.TweenSpeed, Enum.EasingStyle.Linear)
+                    current_tween = TweenService:Create(Character:WaitForChild("HumanoidRootPart"), tweenInfo, {CFrame = dist * AdditionalCFrame})
+                else
+                    local tweenInfo = TweenInfo.new((Character:WaitForChild("HumanoidRootPart").Position - dist.Position).magnitude / _G.Options.TweenSpeed, Enum.EasingStyle.Linear)
+                    current_tween = TweenService:Create(Character:WaitForChild("HumanoidRootPart"), tweenInfo, {CFrame = dist})
+                end
+     
+                current_tween:Play()
+                noclip_tween = true
+                current_tween.Completed:Wait()
+                current_tween = nil
+                noclip_tween = false
+            end
+        end
         
         local teleportOptions = {
             ["Nomay Village"] = function()
@@ -1093,14 +1120,14 @@ if game.PlaceId == 5956785391 then
         local muzanTeleport = Teleport:CreateButton({
             Name = "Teleport to Muzan",
             Callback = function ()
-                TweenService:Create(Character.HumanoidRootPart, TweenInfo.new(3), {CFrame = CFrame.new(workspace.Muzan.SpawnPos.Value)}):Play()
+                TeleportTween(CFrame.new(workspace.Muzan.SpawnPos.Value))
             end
         })
-
+        
         local doctorTeleport = Teleport:CreateButton({
             Name = "Teleport to Doctor Higoshima",
             Callback = function ()
-                TweenService:Create(Character.HumanoidRootPart, TweenInfo.new(3), {CFrame = CFrame.new(525.875, 321.917603, -2304.84766, -0.655203104, 0, 0.755452693, 0, 1, 0, -0.755452693, 0, -0.655203104)}):Play()
+                TeleportTween(CFrame.new(525.875, 321.917603, -2304.84766, -0.655203104, 0, 0.755452693, 0, 1, 0, -0.755452693, 0, -0.655203104))
             end
         })
         
@@ -1621,46 +1648,38 @@ if game.PlaceId == 6152116144 then
             end
         })
         
-        
-        local infBreathingEnabled = false
         local infBreathingToggle = miscellaneousTab:CreateToggle({
             Name = "INF Breathing",
             CurrentValue = false,
             Callback = function (Value)
-                infBreathingEnabled = (Value)
+                _G.Options.infbreath = (Value)
             end
         })
         
-        -- It's better to create a local reference to getrenv()._G for better performance.
-        local _G = getrenv()._G
-        
         spawn(function()
             while task.wait() do
-                if infBreathingEnabled then
-                    _G.infbreath = true
-                    _G:Breath(-100) -- Assuming the function to reduce breathing is _G.Breath(-100)
+                if _G.Options.infbreath then
+                    getrenv()._G:Breath(-100)
                 else
-                    _G.infbreath = false
+                    _G.Options.infbreath = false
                 end
             end
         end)
         
-        local infStaminaEnabled = false
         local infStamToggle = miscellaneousTab:CreateToggle({
             Name = "INF Stamina",
             CurrentValue = false,
             Callback = function (Value)
-                infStaminaEnabled = (Value)
+                _G.Options.infstam = (Value)
             end
         })
         
         spawn(function()
             while task.wait() do
-                if infStaminaEnabled then
-                    _G.infstam = true
-                    _G:Stamina(-100) -- Assuming the function to reduce stamina is _G.Stamina(-100)
+                if _G.Options.infstam then
+                    getrenv()._G:Stamina(-100)
                 else
-                    _G.infstam = false
+                    _G.Options.infstam = false
                 end
             end
         end)
