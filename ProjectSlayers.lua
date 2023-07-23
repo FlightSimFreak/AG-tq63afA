@@ -25,6 +25,68 @@ local function onCharacterRemoved()
 end
 
 LocalPlayer.CharacterRemoving:Connect(onCharacterRemoved)
+
+_G.Options ={
+    TweenSpeed = 240,
+    infstam = false,
+    infbreath = false,
+}
+
+local skill_module = require(game:GetService("ReplicatedStorage").Modules.Server["Skills_Modules_Handler"])
+
+hookfunction(skill_module.Kick, function()
+    return nil
+end);
+
+local anti_cheat1 = LocalPlayer.PlayerScripts["Small_Scripts"]["Client_Global_utility"]
+local anti_cheat2 = LocalPlayer.PlayerScripts["Small_Scripts"]["client_global_delete_script"]
+
+hookfunction(anti_cheat1.GetPropertyChangedSignal, function()
+    return
+end)
+
+hookfunction(anti_cheat2.GetPropertyChangedSignal, function()
+    return
+end)
+
+anti_cheat1.Disabled = true
+anti_cheat2.Disabled = true
+
+local Namecall
+Namecall = hookmetamethod(game, '__namecall', function(self, ...)
+    local Args = {...}
+    local method = getnamecallmethod()
+    
+    if method == 'FireServer' and string.find(self.Name, 'mod') then 
+        return 
+    end
+    
+    if method == 'InvokeServer' and self.Name == 'reporthackerasdasd' then 
+        return 
+    end
+    
+    if method == 'FireServer' and self.Name == 'To_Server_commends' then 
+        return
+    end
+    
+    if method:lower() == 'kick' then 
+        return 
+    end
+    
+    return Namecall(self, ...)
+end)
+
+local hook
+hook = hookmetamethod(game, "__namecall", function(self, ...)
+   args = {...}
+
+   if getnamecallmethod() == "FireServer" and #args == 2 and type(args[1]) == "boolean" then
+       return task.wait(9e9)
+   end
+
+   return hook(self, ...)
+end)
+
 -- Main Menu
 if game.PlaceId == 5956785391 then
     local Window = Rayfield:CreateWindow({
@@ -200,67 +262,6 @@ if game.PlaceId == 5956785391 then
         end
         -- [Map 2]
                 if tostring(game.PlaceId):sub(1, 4) == "1388" then
-
-                    local skill_module = require(game:GetService("ReplicatedStorage").Modules.Server["Skills_Modules_Handler"])
-
-                    hookfunction(skill_module.Kick, function()
-                        return nil
-                    end);
-                    
-                    local anti_cheat1 = LocalPlayer.PlayerScripts["Small_Scripts"]["Client_Global_utility"]
-                    local anti_cheat2 = LocalPlayer.PlayerScripts["Small_Scripts"]["client_global_delete_script"]
-                    
-                    hookfunction(anti_cheat1.GetPropertyChangedSignal, function()
-                        return
-                    end)
-                    
-                    hookfunction(anti_cheat2.GetPropertyChangedSignal, function()
-                        return
-                    end)
-                    
-                    anti_cheat1.Disabled = true
-                    anti_cheat2.Disabled = true
-                    
-                    local Namecall
-                    Namecall = hookmetamethod(game, '__namecall', function(self, ...)
-                        local Args = {...}
-                        local method = getnamecallmethod()
-                        
-                        if method == 'FireServer' and string.find(self.Name, 'mod') then 
-                            return 
-                        end
-                        
-                        if method == 'InvokeServer' and self.Name == 'reporthackerasdasd' then 
-                            return 
-                        end
-                        
-                        if method == 'FireServer' and self.Name == 'To_Server_commends' then 
-                            return
-                        end
-                        
-                        if method:lower() == 'kick' then 
-                            return 
-                        end
-                        
-                        return Namecall(self, ...)
-                    end)
-
-                    _G.Options ={
-                        TweenSpeed = 120,
-                        infstam = false,
-                        infbreath = false,
-                    }
-                    
-                    local hook
-                    hook = hookmetamethod(game, "__namecall", function(self, ...)
-                       args = {...}
-                    
-                       if getnamecallmethod() == "FireServer" and #args == 2 and type(args[1]) == "boolean" then
-                           return task.wait(9e9)
-                       end
-                    
-                       return hook(self, ...)
-                    end)
 
                     local Window = Rayfield:CreateWindow({
                         Name = "Faceless Premium Hub | Project Slayers",
@@ -1164,61 +1165,6 @@ end
 
 --[Map 1]
 if game.PlaceId == 6152116144 then
-
-    local skill_module = require(game:GetService("ReplicatedStorage").Modules.Server["Skills_Modules_Handler"])
-
-    hookfunction(skill_module.Kick, function()
-        return nil
-    end);
-    
-    local anti_cheat1 = LocalPlayer.PlayerScripts["Small_Scripts"]["Client_Global_utility"]
-    local anti_cheat2 = LocalPlayer.PlayerScripts["Small_Scripts"]["client_global_delete_script"]
-    
-    hookfunction(anti_cheat1.GetPropertyChangedSignal, function()
-        return
-    end)
-    
-    hookfunction(anti_cheat2.GetPropertyChangedSignal, function()
-        return
-    end)
-    
-    anti_cheat1.Disabled = true
-    anti_cheat2.Disabled = true
-    
-    local Namecall
-    Namecall = hookmetamethod(game, '__namecall', function(self, ...)
-        local Args = {...}
-        local method = getnamecallmethod()
-        
-        if method == 'FireServer' and string.find(self.Name, 'mod') then 
-            return 
-        end
-        
-        if method == 'InvokeServer' and self.Name == 'reporthackerasdasd' then 
-            return 
-        end
-        
-        if method == 'FireServer' and self.Name == 'To_Server_commends' then 
-            return
-        end
-        
-        if method:lower() == 'kick' then 
-            return 
-        end
-        
-        return Namecall(self, ...)
-    end)
-    
-    local hook
-    hook = hookmetamethod(game, "__namecall", function(self, ...)
-       args = {...}
-    
-       if getnamecallmethod() == "FireServer" and #args == 2 and type(args[1]) == "boolean" then
-           return task.wait(9e9)
-       end
-    
-       return hook(self, ...)
-    end)
 
     local Window = Rayfield:CreateWindow({
         Name = "Faceless Premium Hub | Project Slayers",
