@@ -9,7 +9,6 @@ local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
 local current_tween
-local noclip_tween
 
 local camera = workspace.CurrentCamera
 
@@ -24,14 +23,6 @@ local function onCharacterRemoved()
     -- This function will be called whenever the player's character is removed (e.g., on death)
     Character = nil
 end
-
-task.spawn(function()
-    while task.wait() do
-        if noclip_tween then
-            Character:WaitForChild("Humanoid"):ChangeState(11)
-        end
-    end
-end)
 
 LocalPlayer.CharacterRemoving:Connect(onCharacterRemoved)
 -- Main Menu
@@ -916,10 +907,8 @@ if game.PlaceId == 5956785391 then
                 end
      
                 current_tween:Play()
-                noclip_tween = true
                 current_tween.Completed:Wait()
                 current_tween = nil
-                noclip_tween = false
             end
         end
         
