@@ -1411,7 +1411,7 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
         local miscellaneousTab = Window:CreateTab("Miscellaneous")
         local LocalPlayerMainSection = miscellaneousTab:CreateSection("Main Settings")
         
-        local Label = miscellaneousTab:CreateLabel("Clan Must Start With A Captial Letter")
+        local Label = miscellaneousTab:CreateLabel("Clan Must Start With A Capital Letter")
         local Input = miscellaneousTab:CreateInput({
         Name = "Change Clan",
         PlaceholderText = "Type Clan Name",
@@ -1486,7 +1486,7 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
                     [1] = true
                 }
                 ReplicatedStorage.Remotes.clan_furiosity_add:FireServer(unpack(args))
-                task.wait(22) -- Delay for 18 seconds before the next call
+                task.wait(22) -- Delay for 22 seconds before the next call
             end
         end
         
@@ -1517,6 +1517,28 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
                     startFuriosityBuffLoop() -- Start the buff loop
                 else
                     stopFuriosityBuffLoop() -- Stop the buff loop
+                end
+            end
+        })
+
+        local spacialAwareness = miscellaneousTab:CreateToggle({
+            Name = "Spacial Awareness",
+            CurrentValue = false,
+            Callback = function (Value)
+                if Value then
+                    local args = {
+                        [1] = true
+                    }
+                    
+                   ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("spacial_awareness_remote"):FireServer(unpack(args))
+                    
+                else
+                    local args = {
+                        [1] = false
+                    }
+                    
+                 ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("spacial_awareness_remote"):FireServer(unpack(args))
+                    
                 end
             end
         })
@@ -1842,7 +1864,186 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
         local Teleport = Window:CreateTab("Teleport")
         local TeleportSection = Teleport:CreateSection("Teleport")
 
-        local WIP = Teleport:CreateLabel("Work In Progress")
+        local teleportOptions = {
+            ["Kiribating Village"] = function()
+                local args = {
+                    [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                    [2] = 36195.927004699995,
+                    [3] = "Kiribating Village"
+                }
+                
+                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
+    
+            end,
+        
+            ["Zapiwara Cave"] = function ()
+                local args = {
+                    [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                    [2] = 36369.907926,
+                    [3] = "Zapiwara Cave"
+                }
+                
+                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))                
+                
+            end,
+        
+            ["Butterfly Mansion"] = function ()
+                local args = {
+                    [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                    [2] = 36395.2812183,
+                    [3] = "Butterfly Mension"
+                }
+                
+              ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))                
+                
+            end,
+        
+            ["Zapiwara Mountain"] = function ()
+                local args = {
+                    [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                    [2] = 36422.1468954,
+                    [3] = "Zapiwara Mountain"
+                }
+                
+                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
+                
+            end,
+        
+            ["Ushumaru Village"] = function ()
+                local args = {
+                    [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                    [2] = 36462.9695794,
+                    [3] = "Ushumaru Village"
+                }
+                
+                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))                
+                
+            end,
+        
+            ["Waroru Cave"] = function ()
+                local args = {
+                    [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                    [2] = 36484.8315136,
+                    [3] = "Waroru Cave"
+                }
+                
+                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))   
+                             
+            end,
+        
+            ["Abubu Cave"] = function ()
+                local args = {
+                    [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                    [2] = 36512.4001561,
+                    [3] = "Abubu Cave"
+                }
+                
+               ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
+                
+            end,
+        
+            ["Final Selection"] = function ()
+                local args = {
+                    [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                    [2] = 36540.8372207,
+                    [3] = "Final Selection"
+                }
+                
+                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))  
+                
+            end,
+        
+            ["Ouwbayashi Home"] = function ()
+                local args = {
+                    [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                    [2] = 36566.7650285,
+                    [3] = "Ouwbayashi Home"
+                }
+                
+                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))                
+                
+            end,
+        
+            ["Wind Trainer"] = function ()
+                local args = {
+                    [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                    [2] = 36592.2484425,
+                    [3] = "Wind Trainer"
+                }
+                
+               ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))                
+                
+            end,
+        
+            ["Dangerous Woods"] = function ()
+                local args = {
+                    [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                    [2] = 36621.7353394,
+                    [3] = "Dangerous Woods"
+                }
+                
+               ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
+                
+            end,
+        
+            ["Slasher Demon"] = function ()
+                local args = {
+                    [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                    [2] = 36654.390417999995,
+                    [3] = "Slasher Demon"
+                }
+                
+                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
+                
+            end,
+        
+            ["Dungeon"] = function ()
+                local args = {
+                    [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                    [2] = 36673.498631099996,
+                    [3] = "Dungeon"
+                }
+                
+                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
+                
+            end,
+        }
+        
+        local selectedPlace = "Kiribating Village"
+        
+        local placeNames = {} -- Create an empty table to store the place names
+        
+        for placeName, _ in pairs(teleportOptions) do
+        table.insert(placeNames, placeName) -- Add each place name to the placeNames table
+        end
+        
+        local TeleportPlace = Teleport:CreateDropdown({
+         Name = "Select Place",
+            Options = placeNames,
+            CurrentOption = {"Kiribating Village"},
+            MultipleOptions = false,
+            Flag = "TeleportPlaceDropDown", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+            Callback = function(Option)
+            -- The function that takes place when the selected option is changed
+            -- The variable (Option) is a table of strings for the current selected options
+            selectedPlace = Option[1]
+            end,
+        })
+        
+        
+        local TeleportButton = Teleport:CreateButton({
+            Name = "Teleport",
+            Callback = function()
+                if not Character then
+                    return
+                end
+        
+                local teleportFunction = teleportOptions[selectedPlace]
+                if teleportFunction then
+                    teleportFunction() -- Execute the selected teleport function
+                end
+            end,
+        })
 
           -- [NPC Teleport]
           local TeleportNPC = Teleport:CreateSection("Teleport NPC")
