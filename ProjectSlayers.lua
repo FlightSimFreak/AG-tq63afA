@@ -1120,12 +1120,11 @@ if game.PlaceId == 5956785391 then
         local muzanTeleport = Teleport:CreateButton({
             Name = "Teleport to Muzan",
             Callback = function()
-                local muzanSpawnPos = workspace.Muzan.SpawnPos.Value
-                if muzanSpawnPos then
-                    TeleportTween(CFrame.new(muzanSpawnPos))
-                else
+                if not workspace:FindFirstChild("Muzan") then
                     return
                 end
+        
+                TeleportTween(CFrame.new(workspace.Muzan.SpawnPos.Value))
             end
         })
         
