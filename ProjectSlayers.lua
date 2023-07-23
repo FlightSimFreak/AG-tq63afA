@@ -46,6 +46,7 @@ _G.Options ={
     TweenSpeed = 240,
     infstam = false,
     infbreath = false,
+    AutoPickFlowers = false,
 }
 
 local skill_module = require(game:GetService("ReplicatedStorage").Modules.Server["Skills_Modules_Handler"])
@@ -775,8 +776,6 @@ if game.PlaceId == 5956785391 then
             while task.wait() do
                 if _G.Options.infbreath then
                     getrenv()._G:Breath(-100)
-                else
-                    _G.Options.infbreath = false
                 end
             end
         end)
@@ -793,8 +792,6 @@ if game.PlaceId == 5956785391 then
             while task.wait() do
                 if _G.Options.infstam then
                     getrenv()._G:Stamina(-100)
-                else
-                    _G.Options.infstam = false
                 end
             end
         end)
@@ -1355,6 +1352,35 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
                 end
             end,
         })
+
+        local farmFlowers = Home:CreateToggle({
+            Name = "Auto Farm Flowers",
+            CurrentValue = false,
+            Flag = "StartFarmFlowers",
+            Callback = function(Value)
+                _G.Options.AutoPickFlowers = Value
+                if _G.Options.AutoPickFlowers then
+                    while _G.Options.AutoPickFlowers do -- Keep looping as long as the toggle is on
+                        local flowers = {}
+                        for _, flower in ipairs(workspace.Demon_Flowers_Spawn:GetDescendants()) do
+                            if flower.Name == "Cube.002" then
+                                table.insert(flowers, flower)
+                            end
+                        end
+                        
+                        for _, flower in ipairs(flowers) do
+                            local distance = (Character.HumanoidRootPart.Position - flower.Position).magnitude
+                            if distance <= 100 then
+                                Character.HumanoidRootPart.CFrame = flower.CFrame
+                            else
+                                TeleportTween(flower.CFrame)
+                            end
+                            task.wait(1) -- Wait for 1 second before moving to the next flower (adjust as needed)
+                        end
+                    end
+                end
+            end
+        })             
         
         -- [GKA]
         local gkaTab = Window:CreateTab("GKA")
@@ -1597,7 +1623,7 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
         end
         
         local universalGodMode = miscellaneousTab:CreateToggle({
-            Name = "Universal God Mode [Requires Scythe Equipped/ 30+ Mas.]",
+            Name = "Universal God Mode [Requires Scythe Equipped/ 28+ Mas.]",
             CurrentValue = false,
             Callback = function(Value)
                 if Value then
@@ -1620,8 +1646,6 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
             while task.wait() do
                 if _G.Options.infbreath then
                     getrenv()._G:Breath(-100)
-                else
-                    _G.Options.infbreath = false
                 end
             end
         end)
@@ -1638,8 +1662,6 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
             while task.wait() do
                 if _G.Options.infstam then
                     getrenv()._G:Stamina(-100)
-                else
-                    _G.Options.infstam = false
                 end
             end
         end)
