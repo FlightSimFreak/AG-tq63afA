@@ -46,8 +46,6 @@ _G.Options ={
     TweenSpeed = 240,
     infstam = false,
     infbreath = false,
-    WalkSpeed = 22.4,
-    JumpPower = 50,
 }
 
 local skill_module = require(game:GetService("ReplicatedStorage").Modules.Server["Skills_Modules_Handler"])
