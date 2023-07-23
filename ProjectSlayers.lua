@@ -10,6 +10,22 @@ local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
 local current_tween
 
+function TeleportTween(dist, AdditionalCFrame)
+    if Character:FindFirstChild("HumanoidRootPart") and Character:FindFirstChild("Humanoid") then
+        if AdditionalCFrame then
+            local tweenInfo = TweenInfo.new((Character:WaitForChild("HumanoidRootPart").Position - dist.Position).magnitude / _G.Options.TweenSpeed, Enum.EasingStyle.Linear)
+            current_tween = TweenService:Create(Character:WaitForChild("HumanoidRootPart"), tweenInfo, {CFrame = dist * AdditionalCFrame})
+        else
+            local tweenInfo = TweenInfo.new((Character:WaitForChild("HumanoidRootPart").Position - dist.Position).magnitude / _G.Options.TweenSpeed, Enum.EasingStyle.Linear)
+            current_tween = TweenService:Create(Character:WaitForChild("HumanoidRootPart"), tweenInfo, {CFrame = dist})
+        end
+
+        current_tween:Play()
+        current_tween.Completed:Wait()
+        current_tween = nil
+    end
+end
+
 local camera = workspace.CurrentCamera
 
 local function onCharacterAdded(character)
@@ -30,6 +46,8 @@ _G.Options ={
     TweenSpeed = 240,
     infstam = false,
     infbreath = false,
+    WalkSpeed = 22.4,
+    JumpPower = 50,
 }
 
 local skill_module = require(game:GetService("ReplicatedStorage").Modules.Server["Skills_Modules_Handler"])
@@ -91,7 +109,7 @@ end)
 if game.PlaceId == 5956785391 then
     local Window = Rayfield:CreateWindow({
         Name = "Faceless Premium Hub | Main Menu",
-        LoadingTitle = "Premium Hub",
+        LoadingTitle = "Faceless Premium Hub",
         LoadingSubtitle = "by Faceless",
         ConfigurationSaving = {
             Enabled = false,
@@ -163,6 +181,10 @@ if game.PlaceId == 5956785391 then
             Name = "Auto Spin For Uzui",
             Callback = function()
                 while ReplicatedStorage.Player_Data[LocalPlayer.Name].Clan.Value ~= "Uzui" do
+                    if ReplicatedStorage.Player_Data[LocalPlayer.Name].Spins.Value <= 50 then
+                        break
+                    end
+
                     local args = {
                         [1] = "check_can_spin"
                     }
@@ -177,6 +199,9 @@ if game.PlaceId == 5956785391 then
             Name = "Auto Spin For Kamado",
             Callback = function()
                 while ReplicatedStorage.Player_Data[LocalPlayer.Name].Clan.Value ~= "Kamado" do
+                    if ReplicatedStorage.Player_Data[LocalPlayer.Name].Spins.Value <= 50 then
+                        break
+                    end
                     local args = {
                         [1] = "check_can_spin"
                     }
@@ -191,6 +216,9 @@ if game.PlaceId == 5956785391 then
             Name = "Auto Spin For Agatsuma",
             Callback = function()
                 while ReplicatedStorage.Player_Data[LocalPlayer.Name].Clan.Value ~= "Agatsuma" do
+                    if ReplicatedStorage.Player_Data[LocalPlayer.Name].Spins.Value <= 50 then
+                        break
+                    end
                     local args = {
                         [1] = "check_can_spin"
                     }
@@ -205,6 +233,9 @@ if game.PlaceId == 5956785391 then
             Name = "Auto Spin For Rengoku",
             Callback = function()
                 while ReplicatedStorage.Player_Data[LocalPlayer.Name].Clan.Value ~= "Rengoku" do
+                    if ReplicatedStorage.Player_Data[LocalPlayer.Name].Spins.Value <= 50 then
+                        break
+                    end
                     local args = {
                         [1] = "check_can_spin"
                     }
@@ -222,6 +253,9 @@ if game.PlaceId == 5956785391 then
             Name = "Auto Spin For Tokito",
             Callback = function()
                 while ReplicatedStorage.Player_Data[LocalPlayer.Name].Clan.Value ~= "Tokito" do
+                    if ReplicatedStorage.Player_Data[LocalPlayer.Name].Spins.Value <= 50 then
+                        break
+                    end
                     local args = {
                         [1] = "check_can_spin"
                     }
@@ -236,6 +270,9 @@ if game.PlaceId == 5956785391 then
             Name = "Auto Spin For Hashibira",
             Callback = function()
                 while ReplicatedStorage.Player_Data[LocalPlayer.Name].Clan.Value ~= "Hashibira" do
+                    if ReplicatedStorage.Player_Data[LocalPlayer.Name].Spins.Value <= 50 then
+                        break
+                    end
                     local args = {
                         [1] = "check_can_spin"
                     }
@@ -261,11 +298,11 @@ if game.PlaceId == 5956785391 then
         
         end
         -- [Map 2]
-                if tostring(game.PlaceId):sub(1, 4) == "1388" then
+                if game.PlaceId == 13881804983 or game.PlaceId == 13883059853 then
 
                     local Window = Rayfield:CreateWindow({
                         Name = "Faceless Premium Hub | Project Slayers",
-                        LoadingTitle = "Premium Hub",
+                        LoadingTitle = "Faceless Premium Hub",
                         LoadingSubtitle = "by Faceless",
                         ConfigurationSaving = {
                             Enabled = false,
@@ -521,6 +558,7 @@ if game.PlaceId == 5956785391 then
             data.Clan.Value = (Text)
         end,
         })
+
         local KillPlayerButton = miscellaneousTab:CreateButton({
             Name = "Kill Character",
             Callback = function()
@@ -896,22 +934,6 @@ if game.PlaceId == 5956785391 then
         -- [Teleport Section]
         local Teleport = Window:CreateTab("Teleport")
         local TeleportSection = Teleport:CreateSection("Teleport")
-
-        function TeleportTween(dist, AdditionalCFrame)
-            if Character:FindFirstChild("HumanoidRootPart") and Character:FindFirstChild("Humanoid") then
-                if AdditionalCFrame then
-                    local tweenInfo = TweenInfo.new((Character:WaitForChild("HumanoidRootPart").Position - dist.Position).magnitude / _G.Options.TweenSpeed, Enum.EasingStyle.Linear)
-                    current_tween = TweenService:Create(Character:WaitForChild("HumanoidRootPart"), tweenInfo, {CFrame = dist * AdditionalCFrame})
-                else
-                    local tweenInfo = TweenInfo.new((Character:WaitForChild("HumanoidRootPart").Position - dist.Position).magnitude / _G.Options.TweenSpeed, Enum.EasingStyle.Linear)
-                    current_tween = TweenService:Create(Character:WaitForChild("HumanoidRootPart"), tweenInfo, {CFrame = dist})
-                end
-     
-                current_tween:Play()
-                current_tween.Completed:Wait()
-                current_tween = nil
-            end
-        end
         
         local teleportOptions = {
             ["Nomay Village"] = function()
@@ -1103,28 +1125,6 @@ if game.PlaceId == 5956785391 then
                 end
             end,
         })
-
-        -- [NPC Teleport]
-        local TeleportNPC = Teleport:CreateSection("Teleport NPC")
-
-        local muzanTeleport = Teleport:CreateButton({
-            Name = "Teleport to Muzan",
-            Callback = function()
-                if not workspace:FindFirstChild("Muzan") then
-                    return
-                end
-        
-                TeleportTween(CFrame.new(workspace.Muzan.SpawnPos.Value))
-            end
-        })
-        
-        
-        local doctorTeleport = Teleport:CreateButton({
-            Name = "Teleport to Doctor Higoshima",
-            Callback = function ()
-                TeleportTween(CFrame.new(525.875, 321.917603, -2304.84766, -0.655203104, 0, 0.755452693, 0, 1, 0, -0.755452693, 0, -0.655203104))
-            end
-        })
         
         -- [GUI SETTINGS]
         local Settings = Window:CreateTab("Settings")
@@ -1164,11 +1164,11 @@ end
 
 
 --[Map 1]
-if game.PlaceId == 6152116144 then
+if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
 
     local Window = Rayfield:CreateWindow({
         Name = "Faceless Premium Hub | Project Slayers",
-        LoadingTitle = "Premium Hub",
+        LoadingTitle = "Faceless Premium Hub",
         LoadingSubtitle = "by Faceless",
         ConfigurationSaving = {
             Enabled = false,
@@ -1844,6 +1844,29 @@ if game.PlaceId == 6152116144 then
         local Teleport = Window:CreateTab("Teleport")
         local TeleportSection = Teleport:CreateSection("Teleport")
 
+        local WIP = Teleport:CreateLabel("Work In Progress")
+
+          -- [NPC Teleport]
+          local TeleportNPC = Teleport:CreateSection("Teleport NPC")
+
+          local muzanTeleport = Teleport:CreateButton({
+              Name = "Teleport to Muzan",
+              Callback = function()
+                  if not workspace:FindFirstChild("Muzan") then
+                      return
+                  end
+          
+                  TeleportTween(CFrame.new(workspace.Muzan.SpawnPos.Value))
+              end
+          })
+          
+          
+          local doctorTeleport = Teleport:CreateButton({
+              Name = "Teleport to Doctor Higoshima",
+              Callback = function ()
+                  TeleportTween(CFrame.new(525.875, 321.917603, -2304.84766, -0.655203104, 0, 0.755452693, 0, 1, 0, -0.755452693, 0, -0.655203104))
+              end
+          })
 
     -- [GUI SETTINGS]
     local Settings = Window:CreateTab("Settings")
