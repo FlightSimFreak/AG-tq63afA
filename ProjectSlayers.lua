@@ -1118,7 +1118,7 @@ if game.PlaceId == 5956785391 then
         local TeleportNPC = Teleport:CreateSection("Teleport NPC")
 
         local muzanTeleport = Teleport:CreateButton({
-            Name = "Teleport to Muzan",
+            Name = "Teleport to Muzan 2",
             Callback = function()
                 local muzanSpawnPos = workspace.Muzan.SpawnPos.Value
                 if muzanSpawnPos then
