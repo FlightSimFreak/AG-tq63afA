@@ -3,6 +3,7 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 
 local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
@@ -1375,7 +1376,7 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
                             else
                                 TeleportTween(flower.CFrame)
                             end
-                            task.wait(1) -- Wait for 1 second before moving to the next flower (adjust as needed)
+                            task.wait(1.5) -- Wait for 1 second before moving to the next flower (adjust as needed)
                         end
                     end
                 end
@@ -1603,7 +1604,7 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
                     [4] = 1
                 }
                 ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("To_Server"):WaitForChild("Handle_Initiate_S"):FireServer(unpack(args))
-                task.wait(.5)
+                task.wait(.4)
             end
         end
         
@@ -1668,10 +1669,6 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
         
         local miscellaneousTabBDASPINS = miscellaneousTab:CreateSection("Others")
 
-        local isAutoBDASpinActive = false
-        local autoBDASpinLoop = nil
-        local chosenBDA = nil
-        
         local bdas = {
             "Ice",
             "Reaper",
@@ -1685,6 +1682,8 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
         }
         
         local bdaNames = {}
+        local chosenBDA = nil
+        local stopLoop = false -- Variable to control the loop
         
         -- Use ipairs instead of pairs for ordered insertion
         for _, bdaName in ipairs(bdas) do
@@ -1696,60 +1695,40 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
             Options = bdaNames,
             CurrentOption = "None",
             MultipleOptions = false,
-            Flag = "Dropdown1",
+            Flag = "BdaDropDown",
             Callback = function(option)
                 chosenBDA = option
             end,
         })
         
-        local autoBDASpinToggle -- Define the toggle variable globally
-        
-        local function startAutoBDASpinLoop()
-            if not autoBDASpinLoop and chosenBDA then  -- Added an extra condition to check if chosenBDA is not nil
-                isAutoBDASpinActive = true
-
-                autoBDASpinLoop = task.spawn(function()
-                    while isAutoBDASpinActive do
-                        local currentBDA = ReplicatedStorage.Player_Data[LocalPlayer.Name].Demon_Art.Value
-                        if currentBDA == chosenBDA then
-                            isAutoBDASpinActive = false
-                            autoBDASpinToggle:Set(false) -- Turn off the toggle when the desired BDA is obtained
-                            break
-                        end
-        
-                        local args = {
-                            [1] = "check_can_spin_demon_art"
-                        }
-        
-                        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("To_Server"):WaitForChild("Handle_Initiate_S_"):InvokeServer(unpack(args))
-                        task.wait(1.5) -- You can adjust the delay time if needed
-                    end
-                    autoBDASpinLoop = nil  -- Set autoBDASpinLoop to nil after the loop ends
-                end)
-            end
-        end
-        
-        
-        local function stopAutoBDASpinLoop()
-            if autoBDASpinLoop then
-                isAutoBDASpinActive = false
-                task.wait()
-                autoBDASpinLoop = nil
-            end
-        end
-        
-        autoBDASpinToggle = miscellaneousTab:CreateToggle({
+        local autoBDASpinToggle = miscellaneousTab:CreateToggle({
             Name = "Auto Blood Demon Art Spin",
             CurrentValue = false,
             Flag = "StartAutoBDASpin",
             Callback = function(value)
                 if value then
-                    startAutoBDASpinLoop()
+                    stopLoop = false -- Ensure the loop is not stopped initially
+                    checkDemonArtValue()
                 else
-                    stopAutoBDASpinLoop()
+                    stopLoop = true -- Set the loop control variable to true to stop the loop
                 end
             end,
-        })             
+        })
+
+        function checkDemonArtValue()
+            while not stopLoop do
+                if chosenBDA == ReplicatedStorage.Player_Data[LocalPlayer.Name].Demon_Art.Value then
+                    autoBDASpinToggle:Set(false) -- Set the toggle to false when the desired BDA is obtained
+                    stopLoop = false
+                    break -- Exit the loop when the desired BDA is obtained
+                end
+                
+                local args = {
+                    [1] = "check_can_spin_demon_art"
+                }
+                ReplicatedStorage.Remotes.To_Server.Handle_Initiate_S_:InvokeServer(unpack(args))
+            end
+        end
         
       -- [ESP]
       local ESP = Window:CreateTab("ESP")
