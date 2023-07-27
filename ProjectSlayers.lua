@@ -57,6 +57,7 @@
         UniversalGodMode = false,
         ESP = false,
         AutoDailySpin = false,
+        AutoSpinBDA = false,
 
     }
 
@@ -1766,10 +1767,11 @@
             
             local autoBDASpinToggle = miscellaneousTab:CreateToggle({
                 Name = "Auto Blood Demon Art Spin",
-                CurrentValue = false,
+                CurrentValue = _G.Options.AutoSpinBDA,
                 Flag = "StartAutoBDASpin",
                 Callback = function(value)
-                    if value then
+                    _G.Options.AutoSpinBDA = (value)
+                    if _G.Options.AutoSpinBDA then
                         stopLoop = false -- Ensure the loop is not stopped initially
                         checkDemonArtValue()
                     else
