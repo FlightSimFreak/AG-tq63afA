@@ -1359,7 +1359,7 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
             CurrentValue = false,
             Flag = "StartFarmFlowers",
             Callback = function(Value)
-                _G.Options.AutoPickFlowers = Value
+                _G.Options.AutoPickFlowers = (Value)
                 if _G.Options.AutoPickFlowers then
                     while _G.Options.AutoPickFlowers do -- Keep looping as long as the toggle is on
                         local flowers = {}
@@ -1376,8 +1376,8 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
                             else
                                 TeleportTween(flower.CFrame)
                             end
-                            task.wait(1.5) -- Wait for 1 second before moving to the next flower (adjust as needed)
                         end
+                        task.wait(1.5)
                     end
                 end
             end
@@ -1667,7 +1667,7 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
             end
         end)
         
-        local miscellaneousTabBDASPINS = miscellaneousTab:CreateSection("Others")
+        local miscellaneousTabBDASPINS = miscellaneousTab:CreateSection("Demon Art Spins")
 
         local bdas = {
             "Ice",
@@ -1729,6 +1729,26 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
                 ReplicatedStorage.Remotes.To_Server.Handle_Initiate_S_:InvokeServer(unpack(args))
             end
         end
+
+        local miscellaneousTabBDASPINS = miscellaneousTab:CreateSection("Information")
+
+        local getBreathingInfo = miscellaneousTab:CreateButton({
+            Name = "Breathing Progress",
+            Callback = function ()
+                local breathingProgress = ReplicatedStorage.Player_Data[LocalPlayer.Name].BreathingProgress["1"].Value
+                local neededBreathingProgress = ReplicatedStorage.Player_Data[LocalPlayer.Name].BreathingProgress["2"].Value
+                game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Breathing Progress: " .. breathingProgress .. "/" .. neededBreathingProgress; Duration = 10; })
+            end
+        })
+
+        local getDemonInfo = miscellaneousTab:CreateButton({
+            Name = "Demon Progress",
+            Callback = function ()
+                local demonProgress = ReplicatedStorage.Player_Data[LocalPlayer.Name].DemonProgress["1"].Value
+                local neededDemonProgress = ReplicatedStorage.Player_Data[LocalPlayer.Name].DemonProgress["2"].Value
+                game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Demon Progress: " .. demonProgress .. "/" .. neededDemonProgress; Duration = 10; })
+            end
+        })
         
       -- [ESP]
       local ESP = Window:CreateTab("ESP")
