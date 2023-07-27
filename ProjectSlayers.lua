@@ -48,6 +48,16 @@ _G.Options ={
     infstam = false,
     infbreath = false,
     AutoPickFlowers = false,
+    AutoCollectChest = false,
+    SpeedandDamageBuff = false,
+    SemiGodMode = false,
+    ArrowGKA = false,
+    Furiosity = false,
+    SpacialAwareness = false,
+    UniversalGodMode = false,
+    ESP = false,
+    AutoDailySpin = false,
+
 }
 
 local skill_module = require(game:GetService("ReplicatedStorage").Modules.Server["Skills_Modules_Handler"])
@@ -164,10 +174,11 @@ if game.PlaceId == 5956785391 then
         
         local startDailySpin = Home:CreateToggle({
             Name = "Auto Daily Spin",
-            CurrentValue = false,
+            CurrentValue = _G.Options.AutoDailySpin,
             Flag = "StartAutoDailySpin",
             Callback = function(Value)
-                if Value then
+                _G.Options.AutoDailySpin = (Value)
+                if _G.Options.AutoDailySpin then
                     startDailySpinLoop() -- Start the auto daily spin loop
                 else
                     stopDailySpinLoop() -- Stop the auto daily spin loop
@@ -180,8 +191,8 @@ if game.PlaceId == 5956785391 then
         local spinForUzui = Home:CreateButton({
             Name = "Auto Spin For Uzui",
             Callback = function()
-                while ReplicatedStorage.Player_Data[LocalPlayer.Name].Clan.Value ~= "Uzui" do
-                    if ReplicatedStorage.Player_Data[LocalPlayer.Name].Spins.Value <= 50 then
+                while ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan.Value ~= "Uzui" do
+                    if ReplicatedStorage["Player_Data"][LocalPlayer.Name].Spins.Value <= 50 then
                         break
                     end
 
@@ -198,8 +209,8 @@ if game.PlaceId == 5956785391 then
         local spinForKamado = Home:CreateButton({
             Name = "Auto Spin For Kamado",
             Callback = function()
-                while ReplicatedStorage.Player_Data[LocalPlayer.Name].Clan.Value ~= "Kamado" do
-                    if ReplicatedStorage.Player_Data[LocalPlayer.Name].Spins.Value <= 50 then
+                while ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan.Value ~= "Kamado" do
+                    if ReplicatedStorage["Player_Data"][LocalPlayer.Name].Spins.Value <= 50 then
                         break
                     end
                     local args = {
@@ -215,8 +226,8 @@ if game.PlaceId == 5956785391 then
         local spinForAgatsuma = Home:CreateButton({
             Name = "Auto Spin For Agatsuma",
             Callback = function()
-                while ReplicatedStorage.Player_Data[LocalPlayer.Name].Clan.Value ~= "Agatsuma" do
-                    if ReplicatedStorage.Player_Data[LocalPlayer.Name].Spins.Value <= 50 then
+                while ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan.Value ~= "Agatsuma" do
+                    if ReplicatedStorage["Player_Data"][LocalPlayer.Name].Spins.Value <= 50 then
                         break
                     end
                     local args = {
@@ -232,8 +243,8 @@ if game.PlaceId == 5956785391 then
         local spinForRengoku = Home:CreateButton({
             Name = "Auto Spin For Rengoku",
             Callback = function()
-                while ReplicatedStorage.Player_Data[LocalPlayer.Name].Clan.Value ~= "Rengoku" do
-                    if ReplicatedStorage.Player_Data[LocalPlayer.Name].Spins.Value <= 50 then
+                while ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan.Value ~= "Rengoku" do
+                    if ReplicatedStorage["Player_Data"][LocalPlayer.Name].Spins.Value <= 50 then
                         break
                     end
                     local args = {
@@ -252,8 +263,8 @@ if game.PlaceId == 5956785391 then
         local spinForTokito = Home:CreateButton({
             Name = "Auto Spin For Tokito",
             Callback = function()
-                while ReplicatedStorage.Player_Data[LocalPlayer.Name].Clan.Value ~= "Tokito" do
-                    if ReplicatedStorage.Player_Data[LocalPlayer.Name].Spins.Value <= 50 then
+                while ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan.Value ~= "Tokito" do
+                    if ReplicatedStorage["Player_Data"][LocalPlayer.Name].Spins.Value <= 50 then
                         break
                     end
                     local args = {
@@ -269,8 +280,8 @@ if game.PlaceId == 5956785391 then
         local spinForHashibira = Home:CreateButton({
             Name = "Auto Spin For Hashibira",
             Callback = function()
-                while ReplicatedStorage.Player_Data[LocalPlayer.Name].Clan.Value ~= "Hashibira" do
-                    if ReplicatedStorage.Player_Data[LocalPlayer.Name].Spins.Value <= 50 then
+                while ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan.Value ~= "Hashibira" do
+                    if ReplicatedStorage["Player_Data"][LocalPlayer.Name].Spins.Value <= 50 then
                         break
                     end
                     local args = {
@@ -491,6 +502,28 @@ if game.PlaceId == 5956785391 then
                 end
             end,
         })
+
+        local autoCollectChestToggle = Home:CreateToggle({
+            Name = "Auto Collect Chest",
+            CurrentValue = _G.Options.AutoCollectChest,
+            Flag = "StartAutoCollectChest",
+            Callback = function (Value)
+                _G.Options.AutoCollectChest = (Value)
+                if _G.Options.AutoCollectChest then
+                    local chest = workspace.Debree:FindFirstChild("Loot_Chest")
+                    
+                    if chest and #chest:WaitForChild("Drops"):GetChildren() > 0 then
+                        local remote = chest:WaitForChild("Add_To_Inventory")
+     
+                        for _,v in next, chest:WaitForChild("Drops"):GetChildren() do
+                            if not ReplicatedStorage["Player_Data"][LocalPlayer.Name].Inventory:FindFirstChild(v.Name, true) then
+                                remote:InvokeServer(v.Name)
+                            end
+                        end
+                    end
+                end
+            end
+        })
         
         -- [GKA]
         local gkaTab = Window:CreateTab("GKA")
@@ -531,9 +564,10 @@ if game.PlaceId == 5956785391 then
         
         local arrowGKA = gkaTab:CreateToggle({
             Name = "Arrow Global Kill Aura [Requires Arrow BDA]",
-            CurrentValue = false,
+            CurrentValue = _G.Options.ArrowGKA,
             Callback = function (Value)
-                if Value then
+                _G.Options.ArrowGKA = (Value)
+                if _G.Options.ArrowGKA then
                     startArrowGKALoop() -- Start the Arrow Global Kill Aura loop
                 else
                     stopArrowGKALoop() -- Stop the Arrow Global Kill Aura loop
@@ -554,8 +588,8 @@ if game.PlaceId == 5956785391 then
         Callback = function(Text)
         -- The function that takes place when the input is changed
         -- The variable (Text) is a string for the value in the text box
-            local data = ReplicatedStorage.Player_Data[LocalPlayer.Name]
-            data.Clan.Value = (Text)
+        local clan = ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan
+        clan.Value = (Text)
         end,
         })
 
@@ -603,9 +637,10 @@ if game.PlaceId == 5956785391 then
         
         local warDrumsBuffToggle = miscellaneousTab:CreateToggle({
             Name = "Speed & Damage Buff [All Races]",
-            CurrentValue = false,
+            CurrentValue = _G.Options.SpeedandDamageBuff,
             Callback = function (Value)
-                if Value then
+                _G.Options.SpeedandDamageBuff = (Value)
+                if _G.Options.SpeedandDamageBuff then
                     startWarDrumsBuffLoop() -- Start the buff loop
                 else
                     stopWarDrumsBuffLoop() -- Stop the buff loop
@@ -647,9 +682,10 @@ if game.PlaceId == 5956785391 then
         
         local furiosityToggle = miscellaneousTab:CreateToggle({
             Name = "Furiosity [More Damage / All Races]",
-            CurrentValue = false,
+            CurrentValue = _G.Options.Furiosity,
             Callback = function (Value)
-                if Value then
+                _G.Options.Furiosity = (Value)
+                if _G.Options.Furiosity then
                     startFuriosityBuffLoop() -- Start the buff loop
                 else
                     stopFuriosityBuffLoop() -- Stop the buff loop
@@ -659,9 +695,10 @@ if game.PlaceId == 5956785391 then
 
         local spacialAwareness = miscellaneousTab:CreateToggle({
             Name = "Spacial Awareness",
-            CurrentValue = false,
+            CurrentValue = _G.Options.SpacialAwareness,
             Callback = function (Value)
-                if Value then
+                _G.Options.SpacialAwareness = (Value)
+                if _G.Options.SpacialAwareness then
                     local args = {
                         [1] = true
                     }
@@ -681,9 +718,10 @@ if game.PlaceId == 5956785391 then
 
         local semiGodModeToggle = miscellaneousTab:CreateToggle({
             Name = "Semi God Mode [All Races]",
-            CurrentValue = false,
+            CurrentValue = _G.Options.SemiGodMode,
             Callback = function (Value)
-                if Value then
+                _G.Options.SemiGodMode = (Value)
+                if _G.Options.SemiGodMode then
                     local args = {
                         [1] = true
                     }
@@ -706,8 +744,8 @@ if game.PlaceId == 5956785391 then
         local getBreathingInfo = miscellaneousTab:CreateButton({
             Name = "Breathing Progress",
             Callback = function ()
-                local breathingProgress = ReplicatedStorage.Player_Data[LocalPlayer.Name].BreathingProgress["1"].Value
-                local neededBreathingProgress = ReplicatedStorage.Player_Data[LocalPlayer.Name].BreathingProgress["2"].Value
+                local breathingProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].BreathingProgress["1"].Value
+                local neededBreathingProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].BreathingProgress["2"].Value
                 game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Breathing Progress: " .. breathingProgress .. "/" .. neededBreathingProgress; Duration = 10; })
             end
         })
@@ -715,8 +753,8 @@ if game.PlaceId == 5956785391 then
         local getDemonInfo = miscellaneousTab:CreateButton({
             Name = "Demon Progress",
             Callback = function ()
-                local demonProgress = ReplicatedStorage.Player_Data[LocalPlayer.Name].DemonProgress["1"].Value
-                local neededDemonProgress = ReplicatedStorage.Player_Data[LocalPlayer.Name].DemonProgress["2"].Value
+                local demonProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].DemonProgress["1"].Value
+                local neededDemonProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].DemonProgress["2"].Value
                 game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Demon Progress: " .. demonProgress .. "/" .. neededDemonProgress; Duration = 10; })
             end
         })
@@ -755,9 +793,10 @@ if game.PlaceId == 5956785391 then
         
         local universalGodMode = miscellaneousTab:CreateToggle({
             Name = "Universal God Mode [Requires Scythe Equipped/ 28+ Mas.]",
-            CurrentValue = false,
+            CurrentValue = _G.Options.UniversalGodMode,
             Callback = function(Value)
-                if Value then
+                _G.Options.UniversalGodMode = (Value)
+                if _G.Options.UniversalGodMode then
                     startUniversalGodModeLoop() -- Start the Universal God Mode loop
                 else
                     stopUniversalGodModeLoop() -- Stop the Universal God Mode loop
@@ -835,11 +874,11 @@ if game.PlaceId == 5956785391 then
            if humanoidRootPart then
                -- Convert 3D position to 2D screen position
                local position, onScreen = camera:WorldToViewportPoint(humanoidRootPart.Position)
-               local powerValue = ReplicatedStorage.Player_Data[player.Name].Power.Value
-               local artValue = ReplicatedStorage.Player_Data[player.Name].Demon_Art.Value
+               local powerValue = ReplicatedStorage["Player_Data"][player.Name].Power.Value
+               local artValue = ReplicatedStorage["Player_Data"][player.Name].Demon_Art.Value
                local healthValue = workspace[player.Name].Humanoid.Health
 
-                local playerRace = ReplicatedStorage.Player_Data[player.Name].Race.Value
+                local playerRace = ReplicatedStorage["Player_Data"][player.Name].Race.Value
                -- Calculate distance between LocalPlayer and the target player
                local distance = (Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).magnitude
    
@@ -896,9 +935,10 @@ if game.PlaceId == 5956785391 then
    
    local Toggle = ESP:CreateToggle({
     Name = "Toggle ESP",
-    CurrentValue = false,
+    CurrentValue = _G.Options.ESP,
     Callback = function(Value)
-        if Value then
+        _G.Options.ESP = (Value)
+        if _G.Options.ESP then
             -- Enable ESP
             for _, player in ipairs(Players:GetPlayers()) do
                 createESP(player)
@@ -1356,32 +1396,48 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
 
         local farmFlowers = Home:CreateToggle({
             Name = "Auto Farm Flowers",
-            CurrentValue = false,
+            CurrentValue = _G.Options.AutoPickFlowers,
             Flag = "StartFarmFlowers",
             Callback = function(Value)
                 _G.Options.AutoPickFlowers = (Value)
-                if _G.Options.AutoPickFlowers then
-                    while _G.Options.AutoPickFlowers do -- Keep looping as long as the toggle is on
-                        local flowers = {}
-                        for _, flower in ipairs(workspace.Demon_Flowers_Spawn:GetDescendants()) do
-                            if flower.Name == "Cube.002" then
-                                table.insert(flowers, flower)
-                            end
-                        end
-                        
-                        for _, flower in ipairs(flowers) do
-                            local distance = (Character.HumanoidRootPart.Position - flower.Position).magnitude
-                            if distance <= 100 then
-                                Character.HumanoidRootPart.CFrame = flower.CFrame
+                
+                    while _G.Options.AutoPickFlowers do
+                        local flower = workspace:WaitForChild("Demon_Flowers_Spawn"):WaitForChild("Cube.002", true)
+                        if flower then
+                            local mag = math.floor((Character:WaitForChild("HumanoidRootPart").Position - flower.Position).Magnitude)
+         
+                            if mag <= 100 then
+                                Character:WaitForChild("HumanoidRootPart").CFrame = flower.CFrame
                             else
                                 TeleportTween(flower.CFrame)
                             end
                         end
                         task.wait(1.5)
                     end
+            end
+        })
+        
+        local autoCollectChestToggle = Home:CreateToggle({
+            Name = "Auto Collect Chest",
+            CurrentValue = _G.Options.AutoCollectChest,
+            Flag = "StartAutoCollectChest",
+            Callback = function (Value)
+                _G.Options.AutoCollectChest = (Value)
+                while _G.Options.AutoCollectChest do
+                    local chest = workspace.Debree:FindFirstChild("Loot_Chest")
+                    
+                    if chest and #chest:WaitForChild("Drops"):GetChildren() > 0 then
+                        local remote = chest:WaitForChild("Add_To_Inventory")
+     
+                        for _,v in next, chest:WaitForChild("Drops"):GetChildren() do
+                            if not ReplicatedStorage["Player_Data"][LocalPlayer.Name].Inventory:FindFirstChild(v.Name, true) then
+                                remote:InvokeServer(v.Name)
+                            end
+                        end
+                    end
                 end
             end
-        })             
+        })
         
         -- [GKA]
         local gkaTab = Window:CreateTab("GKA")
@@ -1423,9 +1479,10 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
         
         local arrowGKA = gkaTab:CreateToggle({
             Name = "Arrow Global Kill Aura [Requires Arrow BDA]",
-            CurrentValue = false,
+            CurrentValue = _G.Options.ArrowGKA,
             Callback = function (Value)
-                if Value then
+                _G.Options.ArrowGKA = (Value)
+                if _G.Options.ArrowGKA then
                     startArrowGKALoop() -- Start the Arrow Global Kill Aura loop
                 else
                     stopArrowGKALoop() -- Stop the Arrow Global Kill Aura loop
@@ -1446,8 +1503,8 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
         Callback = function(Text)
         -- The function that takes place when the input is changed
         -- The variable (Text) is a string for the value in the text box
-            local data = ReplicatedStorage.Player_Data[LocalPlayer.Name]
-            data.Clan.Value = Text
+            local clan = ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan
+            clan.Value = (Text)
         end,
         })
         local KillPlayerButton = miscellaneousTab:CreateButton({
@@ -1494,9 +1551,10 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
         
         local warDrumsBuffToggle = miscellaneousTab:CreateToggle({
             Name = "Speed & Damage Buff [All Races]",
-            CurrentValue = false,
+            CurrentValue = _G.Options.SpeedandDamageBuff,
             Callback = function (Value)
-                if Value then
+                _G.Options.SpeedandDamageBuff = (Value)
+                if _G.Options.SpeedandDamageBuff then
                     startWarDrumsBuffLoop() -- Start the buff loop
                 else
                     stopWarDrumsBuffLoop() -- Stop the buff loop
@@ -1538,9 +1596,10 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
         
         local furiosityToggle = miscellaneousTab:CreateToggle({
             Name = "Furiosity [More Damage / All Races]",
-            CurrentValue = false,
+            CurrentValue = _G.Options.Furiosity,
             Callback = function (Value)
-                if Value then
+                _G.Options.Furiosity = (Value)
+                if _G.Options.Furiosity then
                     startFuriosityBuffLoop() -- Start the buff loop
                 else
                     stopFuriosityBuffLoop() -- Stop the buff loop
@@ -1550,9 +1609,10 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
 
         local spacialAwareness = miscellaneousTab:CreateToggle({
             Name = "Spacial Awareness",
-            CurrentValue = false,
+            CurrentValue = _G.Options.SpacialAwareness,
             Callback = function (Value)
-                if Value then
+                _G.Options.SpacialAwareness = (Value)
+                if _G.Options.SpacialAwareness then
                     local args = {
                         [1] = true
                     }
@@ -1572,9 +1632,10 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
 
         local semiGodModeToggle = miscellaneousTab:CreateToggle({
             Name = "Semi God Mode [All Races]",
-            CurrentValue = false,
+            CurrentValue = _G.Options.SemiGodMode,
             Callback = function (Value)
-                if Value then
+                _G.Options.SemiGodMode = (Value)
+                if _G.Options.SemiGodMode then
                     local args = {
                         [1] = true
                     }
@@ -1625,9 +1686,10 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
         
         local universalGodMode = miscellaneousTab:CreateToggle({
             Name = "Universal God Mode [Requires Scythe Equipped/ 28+ Mas.]",
-            CurrentValue = false,
+            CurrentValue = _G.Options.UniversalGodMode,
             Callback = function(Value)
-                if Value then
+                _G.Options.UniversalGodMode = (Value)
+                if _G.Options.UniversalGodMode then
                     startUniversalGodModeLoop() -- Start the Universal God Mode loop
                 else
                     stopUniversalGodModeLoop() -- Stop the Universal God Mode loop
@@ -1717,7 +1779,7 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
 
         function checkDemonArtValue()
             while not stopLoop do
-                if chosenBDA == ReplicatedStorage.Player_Data[LocalPlayer.Name].Demon_Art.Value then
+                if chosenBDA == ReplicatedStorage["Player_Data"][LocalPlayer.Name].Demon_Art.Value then
                     autoBDASpinToggle:Set(false) -- Set the toggle to false when the desired BDA is obtained
                     stopLoop = false
                     break -- Exit the loop when the desired BDA is obtained
@@ -1735,8 +1797,8 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
         local getBreathingInfo = miscellaneousTab:CreateButton({
             Name = "Breathing Progress",
             Callback = function ()
-                local breathingProgress = ReplicatedStorage.Player_Data[LocalPlayer.Name].BreathingProgress["1"].Value
-                local neededBreathingProgress = ReplicatedStorage.Player_Data[LocalPlayer.Name].BreathingProgress["2"].Value
+                local breathingProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].BreathingProgress["1"].Value
+                local neededBreathingProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].BreathingProgress["2"].Value
                 game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Breathing Progress: " .. breathingProgress .. "/" .. neededBreathingProgress; Duration = 10; })
             end
         })
@@ -1744,8 +1806,8 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
         local getDemonInfo = miscellaneousTab:CreateButton({
             Name = "Demon Progress",
             Callback = function ()
-                local demonProgress = ReplicatedStorage.Player_Data[LocalPlayer.Name].DemonProgress["1"].Value
-                local neededDemonProgress = ReplicatedStorage.Player_Data[LocalPlayer.Name].DemonProgress["2"].Value
+                local demonProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].DemonProgress["1"].Value
+                local neededDemonProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].DemonProgress["2"].Value
                 game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Demon Progress: " .. demonProgress .. "/" .. neededDemonProgress; Duration = 10; })
             end
         })
@@ -1788,11 +1850,11 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
               if humanoidRootPart then
                   -- Convert 3D position to 2D screen position
                   local position, onScreen = camera:WorldToViewportPoint(humanoidRootPart.Position)
-                  local powerValue = ReplicatedStorage.Player_Data[player.Name].Power.Value
-                  local artValue = ReplicatedStorage.Player_Data[player.Name].Demon_Art.Value
+                  local powerValue = ReplicatedStorage["Player_Data"][player.Name].Power.Value
+                  local artValue = ReplicatedStorage["Player_Data"][player.Name].Demon_Art.Value
                   local healthValue = workspace[player.Name].Humanoid.Health
    
-                   local playerRace = ReplicatedStorage.Player_Data[player.Name].Race.Value
+                   local playerRace = ReplicatedStorage["Player_Data"][player.Name].Race.Value
                   -- Calculate distance between LocalPlayer and the target player
                   local distance = (Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).magnitude
       
@@ -1850,9 +1912,10 @@ if game.PlaceId == 6152116144 or game.PlaceId == 13883279773 then
       
       local Toggle = ESP:CreateToggle({
        Name = "Toggle ESP",
-       CurrentValue = false,
+       CurrentValue = _G.Options.ESP,
        Callback = function(Value)
-           if Value then
+        _G.Options.ESP = (Value)
+           if  _G.Options.ESP then
                -- Enable ESP
                for _, player in ipairs(Players:GetPlayers()) do
                    createESP(player)
