@@ -151,9 +151,6 @@
                ESPLabels[player] = nil
            end
        end
-       
-       -- Connect events for player joining and leaving
-       Players.PlayerRemoving:Connect(removeESP)
 
        local chosenBDA = nil
        local stopLoop = false -- Variable to control the loop
