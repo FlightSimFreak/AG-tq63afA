@@ -25,6 +25,10 @@
     local furiosityToggle
     local spacialAwareness
     local semiGodModeToggle
+    local farmFlowers
+    local ClanInput
+    local KillPlayerButton
+    local TeleportButton
 
 
     local camera = workspace.CurrentCamera
@@ -833,7 +837,7 @@
             local miscellaneousTab = Window:CreateTab("Miscellaneous")
             local LocalPlayerMainSection = miscellaneousTab:CreateSection("Main Settings")
 
-            local ClanInput = miscellaneousTab:CreateInput({
+            ClanInput = miscellaneousTab:CreateInput({
             Name = "Change Clan",
             PlaceholderText = "Type Clan Name",
             RemoveTextAfterFocusLost = true,
@@ -842,7 +846,7 @@
             end,
             })
 
-            local KillPlayerButton = miscellaneousTab:CreateButton({
+                KillPlayerButton = miscellaneousTab:CreateButton({
                 Name = "Kill Character",
                 Callback = function()
                     KillCharacter()
@@ -1054,7 +1058,7 @@
                 end,
             })
             
-            local TeleportButton = Teleport:CreateButton({
+                TeleportButton = Teleport:CreateButton({
                 Name = "Teleport",
                 Callback = function()
                     if not Character then
@@ -1270,7 +1274,7 @@
                 end,
             })
             
-            local startFarmButton = Home:CreateToggle({
+                startFarmButton = Home:CreateToggle({
                 Name = "Kill Aura",
                 CurrentValue = false,
                 Flag = "StartFarmButton", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
@@ -1297,7 +1301,7 @@
                 end,
             })
 
-            local farmFlowers = Home:CreateToggle({
+                farmFlowers = Home:CreateToggle({
                 Name = "Auto Farm Flowers",
                 CurrentValue = _G.Options.AutoPickFlowers,
                 Flag = "StartFarmFlowers",
@@ -1320,7 +1324,7 @@
                 end
             })
             
-            local autoCollectChestToggle = Home:CreateToggle({
+                autoCollectChestToggle = Home:CreateToggle({
                 Name = "Auto Collect Chest",
                 CurrentValue = _G.Options.AutoCollectChest,
                 Flag = "StartAutoCollectChest",
@@ -1336,7 +1340,7 @@
             local gkaTab = Window:CreateTab("GKA")
             local gkaSection = gkaTab:CreateSection("Main Global Kill Aura")
             
-            local arrowGKA = gkaTab:CreateToggle({
+                arrowGKA = gkaTab:CreateToggle({
                 Name = "Arrow Global Kill Aura [Requires Arrow BDA]",
                 CurrentValue = _G.Options.ArrowGKA,
                 Callback = function (Value)
@@ -1353,7 +1357,7 @@
             local miscellaneousTab = Window:CreateTab("Miscellaneous")
             local LocalPlayerMainSection = miscellaneousTab:CreateSection("Main Settings")
 
-            local Input = miscellaneousTab:CreateInput({
+            ClanInput = miscellaneousTab:CreateInput({
             Name = "Change Clan",
             PlaceholderText = "Type Clan Name",
             RemoveTextAfterFocusLost = true,
@@ -1362,7 +1366,7 @@
             end,
             })
 
-            local KillPlayerButton = miscellaneousTab:CreateButton({
+                KillPlayerButton = miscellaneousTab:CreateButton({
                 Name = "Kill Character",
                 Callback = function()
                     KillCharacter()
@@ -1372,7 +1376,7 @@
             local LocalPlayerBuffs = miscellaneousTab:CreateSection("Character Buffs & God Modes")
 
              --[Scythe God Mode]
-             local universalGodMode = miscellaneousTab:CreateToggle({
+                universalGodMode = miscellaneousTab:CreateToggle({
                 Name = "Universal God Mode [Requires Scythe Equipped/ 28+ Mas.]",
                 CurrentValue = _G.Options.UniversalGodMode,
                 Callback = function(Value)
@@ -1385,7 +1389,7 @@
                 end
             })
             
-            local warDrumsBuffToggle = miscellaneousTab:CreateToggle({
+                warDrumsBuffToggle = miscellaneousTab:CreateToggle({
                 Name = "Speed & Damage Buff [All Races]",
                 CurrentValue = _G.Options.SpeedandDamageBuff,
                 Callback = function (Value)
@@ -1398,7 +1402,7 @@
                 end
             })
             
-            local furiosityToggle = miscellaneousTab:CreateToggle({
+                furiosityToggle = miscellaneousTab:CreateToggle({
                 Name = "Furiosity [More Damage / All Races]",
                 CurrentValue = _G.Options.Furiosity,
                 Callback = function (Value)
@@ -1411,7 +1415,7 @@
                 end
             })
 
-            local spacialAwareness = miscellaneousTab:CreateToggle({
+                spacialAwareness = miscellaneousTab:CreateToggle({
                 Name = "Spacial Awareness",
                 CurrentValue = _G.Options.SpacialAwareness,
                 Callback = function (Value)
@@ -1434,7 +1438,7 @@
                 end
             })
 
-            local semiGodModeToggle = miscellaneousTab:CreateToggle({
+                semiGodModeToggle = miscellaneousTab:CreateToggle({
                 Name = "Semi God Mode [All Races]",
                 CurrentValue = _G.Options.SemiGodMode,
                 Callback = function (Value)
@@ -1457,7 +1461,7 @@
                 end
             })
             
-            local infBreathingToggle = miscellaneousTab:CreateToggle({
+                infBreathingToggle = miscellaneousTab:CreateToggle({
                 Name = "INF Breathing",
                 CurrentValue = false,
                 Callback = function (Value)
@@ -1465,7 +1469,7 @@
                 end
             })
             
-            local infStamToggle = miscellaneousTab:CreateToggle({
+                infStamToggle = miscellaneousTab:CreateToggle({
                 Name = "INF Stamina",
                 CurrentValue = false,
                 Callback = function (Value)
@@ -1616,7 +1620,7 @@
                 end,
             })
             
-            local TeleportButton = Teleport:CreateButton({
+                TeleportButton = Teleport:CreateButton({
                 Name = "Teleport",
                 Callback = function()
                     if not Character then
