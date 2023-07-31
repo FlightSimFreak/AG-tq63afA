@@ -11,22 +11,6 @@
 
     local current_tween
 
-    function TeleportTween(dist, AdditionalCFrame)
-        if Character:FindFirstChild("HumanoidRootPart") and Character:FindFirstChild("Humanoid") then
-            if AdditionalCFrame then
-                local tweenInfo = TweenInfo.new((Character:WaitForChild("HumanoidRootPart").Position - dist.Position).magnitude / _G.Options.TweenSpeed, Enum.EasingStyle.Linear)
-                current_tween = TweenService:Create(Character:WaitForChild("HumanoidRootPart"), tweenInfo, {CFrame = dist * AdditionalCFrame})
-            else
-                local tweenInfo = TweenInfo.new((Character:WaitForChild("HumanoidRootPart").Position - dist.Position).magnitude / _G.Options.TweenSpeed, Enum.EasingStyle.Linear)
-                current_tween = TweenService:Create(Character:WaitForChild("HumanoidRootPart"), tweenInfo, {CFrame = dist})
-            end
-
-            current_tween:Play()
-            current_tween.Completed:Wait()
-            current_tween = nil
-        end
-    end
-
     local camera = workspace.CurrentCamera
 
     local function onCharacterAdded(character)
@@ -60,6 +44,304 @@
         AutoSpinBDA = false,
 
     }
+
+    spawn(function()
+        while task.wait() do
+            if _G.Options.infbreath then
+                getrenv()._G:Breath(-100)
+            end
+        end
+    end)
+    
+    spawn(function()
+        while task.wait() do
+            if _G.Options.infstam then
+                getrenv()._G:Stamina(-100)
+            end
+        end
+    end)
+
+       -- Tables to store ESP labels and drawing objects
+       local ESPLabels = {}
+       local DrawingPool = {}
+       
+       -- Helper function to create or reuse a drawing object
+       local function getDrawingObject()
+           local drawingObject = next(DrawingPool) or Drawing.new("Text")
+           DrawingPool[drawingObject] = nil
+           drawingObject.Visible = false
+           drawingObject.Center = true
+           drawingObject.Outline = true
+           drawingObject.Font = 2
+           drawingObject.Color = Color3.fromRGB(255, 255, 255)
+           drawingObject.Size = 13
+           return drawingObject
+       end
+       
+       -- Helper function to return a drawing object to the pool for reuse
+       local function returnDrawingObject(drawingObject)
+           drawingObject.Visible = false
+           DrawingPool[drawingObject] = true
+       end
+       
+       -- Helper function to update the ESP labels for a player
+       local function updatePlayerESP(player, labelData)
+           local playerESP, playerInfo = labelData.ESP, labelData.Info
+           if player == LocalPlayer then
+               -- Hide ESP labels for the local player
+               playerESP.Visible, playerInfo.Visible = false, false
+           else
+               local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+               if humanoidRootPart then
+                   -- Convert 3D position to 2D screen position
+                   local position, onScreen = camera:WorldToViewportPoint(humanoidRootPart.Position)
+                   local powerValue = ReplicatedStorage["Player_Data"][player.Name].Power.Value
+                   local artValue = ReplicatedStorage["Player_Data"][player.Name].Demon_Art.Value
+                   local healthValue = workspace[player.Name].Humanoid.Health
+   
+                   local playerRace = ReplicatedStorage["Player_Data"][player.Name].Race.Value
+                   -- Calculate distance between LocalPlayer and the target player
+                   local distance = (Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).magnitude
+       
+                   -- Update the ESP label with player information and distance
+                   playerESP.Position, playerESP.Visible, playerESP.Text = Vector2.new(position.X, position.Y), onScreen, "Username: " .. player.Name
+                   playerInfo.Visible, playerInfo.Text = onScreen, "Health: " .. math.floor(healthValue)
+                   playerInfo.Position = Vector2.new(position.X, position.Y + 15)  -- Adjust the position for distance
+                   playerInfo.Text = playerInfo.Text .. string.format("\nDistance: %.2f studs", distance)
+                   playerInfo.Text = playerInfo.Text .. ((playerRace == 1 or playerRace == 2) and "\nBreathing: " .. powerValue or "")
+                   playerInfo.Text = playerInfo.Text .. (playerRace == 3 and "\nBlood Demon Art: " .. artValue or "")
+               else
+                   -- Hide ESP labels if the player's character is not available
+                   playerESP.Visible, playerInfo.Visible = false, false
+               end
+           end
+       end
+       
+       -- Create ESP labels and start updating them for a new player
+       local function createESP(player)
+           local playerESP, playerInfo = getDrawingObject(), getDrawingObject()
+           local HeartBeat = RunService.Heartbeat:Connect(function()
+               updatePlayerESP(player, ESPLabels[player])
+           end)
+       
+           -- Store the ESP label data for the player
+           ESPLabels[player] = {
+               ESP = playerESP,
+               Info = playerInfo,
+               HeartBeat = HeartBeat
+           }
+       end
+       
+       -- Update all ESP labels for all players
+       local function updateESPLabels()
+           for player, labelData in pairs(ESPLabels) do
+               updatePlayerESP(player, labelData)
+           end
+       end
+       
+       -- Remove ESP labels and stop updating them for a player leaving the game
+       local function removeESP(player)
+           local labelData = ESPLabels[player]
+           if labelData then
+               local playerESP, playerInfo = labelData.ESP, labelData.Info
+               playerESP.Visible, playerInfo.Visible = false, false
+               returnDrawingObject(playerESP)
+               returnDrawingObject(playerInfo)
+               labelData.HeartBeat:Disconnect()
+               ESPLabels[player] = nil
+           end
+       end
+       
+       -- Connect events for player joining and leaving
+       Players.PlayerRemoving:Connect(removeESP)
+
+       local chosenBDA = nil
+       local stopLoop = false -- Variable to control the loop
+
+    function checkDemonArtValue()
+        while not stopLoop do
+            if chosenBDA == ReplicatedStorage["Player_Data"][LocalPlayer.Name].Demon_Art.Value then
+                autoBDASpinToggle:Set(false) -- Set the toggle to false when the desired BDA is obtained
+                stopLoop = false
+                break -- Exit the loop when the desired BDA is obtained
+            end
+            
+            local args = {
+                [1] = "check_can_spin_demon_art"
+            }
+            ReplicatedStorage.Remotes.To_Server.Handle_Initiate_S_:InvokeServer(unpack(args))
+        end
+    end
+
+    local function TeleportTween(dist, AdditionalCFrame)
+        if Character:FindFirstChild("HumanoidRootPart") and Character:FindFirstChild("Humanoid") then
+            if AdditionalCFrame then
+                local tweenInfo = TweenInfo.new((Character:WaitForChild("HumanoidRootPart").Position - dist.Position).magnitude / _G.Options.TweenSpeed, Enum.EasingStyle.Linear)
+                current_tween = TweenService:Create(Character:WaitForChild("HumanoidRootPart"), tweenInfo, {CFrame = dist * AdditionalCFrame})
+            else
+                local tweenInfo = TweenInfo.new((Character:WaitForChild("HumanoidRootPart").Position - dist.Position).magnitude / _G.Options.TweenSpeed, Enum.EasingStyle.Linear)
+                current_tween = TweenService:Create(Character:WaitForChild("HumanoidRootPart"), tweenInfo, {CFrame = dist})
+            end
+
+            current_tween:Play()
+            current_tween.Completed:Wait()
+            current_tween = nil
+        end
+    end
+
+    local function AutoCollectChest()
+        while _G.Options.AutoCollectChest do
+            local chest = workspace.Debree:FindFirstChild("Loot_Chest")
+            
+            if chest and #chest:WaitForChild("Drops"):GetChildren() > 0 then
+                local remote = chest:WaitForChild("Add_To_Inventory")
+
+                for _,v in next, chest:WaitForChild("Drops"):GetChildren() do
+                    if not ReplicatedStorage["Player_Data"][LocalPlayer.Name].Inventory:FindFirstChild(v.Name, true) then
+                        remote:InvokeServer(v.Name)
+                    end
+                end
+            end
+            task.wait(1.5)
+        end
+    end
+
+    local function ChangeClan(Text)
+        local clan = ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan
+        clan.Value = (Text)
+    end
+
+    local function KillCharacter()
+        Character:WaitForChild("Humanoid").Health = 0
+    end
+
+    local isBuffActive = false -- Flag to track if the buff is currently active
+    local warDrumsBuffLoop = nil
+    
+    local function activateWarDrumsBuff()
+        while isBuffActive do
+            local args = {
+                [1] = true
+            }
+            ReplicatedStorage.Remotes.war_Drums_remote:FireServer(unpack(args))
+            task.wait(20) -- Delay for 20 seconds before the next call
+        end
+    end
+    
+    local function stopWarDrumsBuffLoop()
+        if warDrumsBuffLoop then
+            isBuffActive = false -- Stop the loop by setting the flag to false
+            task.wait() -- Yield the current thread so the loop can finish
+            local args = {
+                [1] = false
+            }
+            ReplicatedStorage.Remotes.war_Drums_remote:FireServer(unpack(args))
+            warDrumsBuffLoop = nil
+        end
+    end
+    
+    local function startWarDrumsBuffLoop()
+        if not warDrumsBuffLoop then
+            isBuffActive = true -- Set the flag to true to start the loop
+            warDrumsBuffLoop = task.spawn(activateWarDrumsBuff) -- Start the buff activation loop
+        end 
+    end
+
+    local isUniversalGodModeActive = false -- Flag to track if Universal God Mode is active
+    local universalGodModeLoop = nil
+    
+    local function activateUniversalGodMode()
+        while isUniversalGodModeActive do
+            local args = {
+                [1] = "skil_ting_asd",
+                [2] = LocalPlayer,
+                [3] = "scythe_asteroid_reap",
+                [4] = 1
+            }
+            ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("To_Server"):WaitForChild("Handle_Initiate_S"):FireServer(unpack(args))
+            task.wait(.5)
+        end
+    end
+    
+    local function stopUniversalGodModeLoop()
+        if universalGodModeLoop then
+            isUniversalGodModeActive = false -- Stop the loop by setting the flag to false
+            task.wait() -- Yield the current thread so the loop can finish
+            universalGodModeLoop = nil
+        end
+    end
+    
+    local function startUniversalGodModeLoop()
+        if not universalGodModeLoop then
+            isUniversalGodModeActive = true -- Set the flag to true to start the loop
+            universalGodModeLoop = task.spawn(activateUniversalGodMode) -- Start the Universal God Mode loop
+        end
+    end
+
+    local isArrowGKAActive = false -- Flag to track if Arrow Global Kill Aura is active
+    local arrowGKALoop = nil
+    
+    local function activateArrowGKA()
+        while isArrowGKAActive do
+            local args = {
+                [1] = "skil_ting_asd",
+                [2] = LocalPlayer,
+                [3] = "arrow_knock_back",
+                [4] = 5
+            }
+            
+        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("To_Server"):WaitForChild("Handle_Initiate_S"):FireServer(unpack(args))
+
+            task.wait(1)
+        end
+    end
+    
+    local function stopArrowGKALoop()
+        if arrowGKALoop then
+            isArrowGKAActive = false -- Stop the loop by setting the flag to false
+            task.wait() -- Yield the current thread so the loop can finish
+            arrowGKALoop = nil
+        end
+    end
+    
+    local function startArrowGKALoop()
+        if not arrowGKALoop then
+            isArrowGKAActive = true -- Set the flag to true to start the loop
+            arrowGKALoop = task.spawn(activateArrowGKA) -- Start the Arrow Global Kill Aura loop
+        end
+    end
+
+    local isFuriosityEnabled = false -- Flag to track if the buff is currently active
+    local furiosityBuffLoop = nil
+    
+    local function activateFuriosityBuff()
+        while isFuriosityEnabled do
+            local args = {
+                [1] = true
+            }
+            ReplicatedStorage.Remotes.clan_furiosity_add:FireServer(unpack(args))
+            task.wait(22) -- Delay for 22 seconds before the next call
+        end
+    end
+    
+    local function stopFuriosityBuffLoop()
+        if furiosityBuffLoop then
+            isFuriosityEnabled = false -- Stop the loop by setting the flag to false
+            task.wait() -- Yield the current thread so the loop can finish
+            local args = {
+                [1] = false
+            }
+            ReplicatedStorage.Remotes.clan_furiosity_add:FireServer(unpack(args))
+            furiosityBuffLoop = nil
+        end
+    end
+    
+    local function startFuriosityBuffLoop()
+        if not furiosityBuffLoop then
+            isFuriosityEnabled = true -- Set the flag to true to start the loop
+            furiosityBuffLoop = task.spawn(activateFuriosityBuff) -- Start the buff activation loop
+        end 
+    end
 
     -- Main Menu
     if game.PlaceId == 5956785391 then
@@ -512,17 +794,7 @@
                 Callback = function (Value)
                     _G.Options.AutoCollectChest = (Value)
                     if _G.Options.AutoCollectChest then
-                        local chest = workspace.Debree:FindFirstChild("Loot_Chest")
-                        
-                        if chest and #chest:WaitForChild("Drops"):GetChildren() > 0 then
-                            local remote = chest:WaitForChild("Add_To_Inventory")
-        
-                            for _,v in next, chest:WaitForChild("Drops"):GetChildren() do
-                                if not ReplicatedStorage["Player_Data"][LocalPlayer.Name].Inventory:FindFirstChild(v.Name, true) then
-                                    remote:InvokeServer(v.Name)
-                                end
-                            end
-                        end
+                        AutoCollectChest()
                     end
                 end
             })
@@ -530,39 +802,6 @@
             -- [GKA]
             local gkaTab = Window:CreateTab("GKA")
             local gkaSection = gkaTab:CreateSection("Main Global Kill Aura")
-            
-            local isArrowGKAActive = false -- Flag to track if Arrow Global Kill Aura is active
-            local arrowGKALoop = nil
-            
-            local function activateArrowGKA()
-                while isArrowGKAActive do
-                    local args = {
-                        [1] = "skil_ting_asd",
-                        [2] = LocalPlayer,
-                        [3] = "arrow_knock_back",
-                        [4] = 5
-                    }
-                    
-                ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("To_Server"):WaitForChild("Handle_Initiate_S"):FireServer(unpack(args))
-
-                    task.wait(1)
-                end
-            end
-            
-            local function stopArrowGKALoop()
-                if arrowGKALoop then
-                    isArrowGKAActive = false -- Stop the loop by setting the flag to false
-                    task.wait() -- Yield the current thread so the loop can finish
-                    arrowGKALoop = nil
-                end
-            end
-            
-            local function startArrowGKALoop()
-                if not arrowGKALoop then
-                    isArrowGKAActive = true -- Set the flag to true to start the loop
-                    arrowGKALoop = task.spawn(activateArrowGKA) -- Start the Arrow Global Kill Aura loop
-                end
-            end
             
             local arrowGKA = gkaTab:CreateToggle({
                 Name = "Arrow Global Kill Aura [Requires Arrow BDA]",
@@ -581,61 +820,24 @@
             -- [Miscellaneous]
             local miscellaneousTab = Window:CreateTab("Miscellaneous")
             local LocalPlayerMainSection = miscellaneousTab:CreateSection("Main Settings")
-            
-            local Label = miscellaneousTab:CreateLabel("Clan Must Start With A Capital Letter")
-            local Input = miscellaneousTab:CreateInput({
+
+            local ClanInput = miscellaneousTab:CreateInput({
             Name = "Change Clan",
             PlaceholderText = "Type Clan Name",
             RemoveTextAfterFocusLost = true,
             Callback = function(Text)
-            -- The function that takes place when the input is changed
-            -- The variable (Text) is a string for the value in the text box
-            local clan = ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan
-            clan.Value = (Text)
+                ChangeClan(Text)
             end,
             })
 
             local KillPlayerButton = miscellaneousTab:CreateButton({
                 Name = "Kill Character",
                 Callback = function()
-                    -- The function that takes place when the button is pressed
-                        Character.Humanoid.Health = 0
+                    KillCharacter()
                 end,
             })
             
             local LocalPlayerBuffs = miscellaneousTab:CreateSection("Character Buffs & God Modes")
-            
-            local isBuffActive = false -- Flag to track if the buff is currently active
-            local warDrumsBuffLoop = nil
-            
-            local function activateWarDrumsBuff()
-                while isBuffActive do
-                    local args = {
-                        [1] = true
-                    }
-                    ReplicatedStorage.Remotes.war_Drums_remote:FireServer(unpack(args))
-                    task.wait(20) -- Delay for 20 seconds before the next call
-                end
-            end
-            
-            local function stopWarDrumsBuffLoop()
-                if warDrumsBuffLoop then
-                    isBuffActive = false -- Stop the loop by setting the flag to false
-                    task.wait() -- Yield the current thread so the loop can finish
-                    local args = {
-                        [1] = false
-                    }
-                    ReplicatedStorage.Remotes.war_Drums_remote:FireServer(unpack(args))
-                    warDrumsBuffLoop = nil
-                end
-            end
-            
-            local function startWarDrumsBuffLoop()
-                if not warDrumsBuffLoop then
-                    isBuffActive = true -- Set the flag to true to start the loop
-                    warDrumsBuffLoop = task.spawn(activateWarDrumsBuff) -- Start the buff activation loop
-                end 
-            end
             
             local warDrumsBuffToggle = miscellaneousTab:CreateToggle({
                 Name = "Speed & Damage Buff [All Races]",
@@ -650,51 +852,6 @@
                 end
             })
             
-            local isFuriosityEnabled = false -- Flag to track if the buff is currently active
-            local furiosityBuffLoop = nil
-            
-            local function activateFuriosityBuff()
-                while isFuriosityEnabled do
-                    local args = {
-                        [1] = true
-                    }
-                    ReplicatedStorage.Remotes.clan_furiosity_add:FireServer(unpack(args))
-                    task.wait(22) -- Delay for 18 seconds before the next call
-                end
-            end
-            
-            local function stopFuriosityBuffLoop()
-                if furiosityBuffLoop then
-                    isFuriosityEnabled = false -- Stop the loop by setting the flag to false
-                    task.wait() -- Yield the current thread so the loop can finish
-                    local args = {
-                        [1] = false
-                    }
-                    ReplicatedStorage.Remotes.clan_furiosity_add:FireServer(unpack(args))
-                    furiosityBuffLoop = nil
-                end
-            end
-            
-            local function startFuriosityBuffLoop()
-                if not furiosityBuffLoop then
-                    isFuriosityEnabled = true -- Set the flag to true to start the loop
-                    furiosityBuffLoop = task.spawn(activateFuriosityBuff) -- Start the buff activation loop
-                end 
-            end
-            
-            local furiosityToggle = miscellaneousTab:CreateToggle({
-                Name = "Furiosity [More Damage / All Races]",
-                CurrentValue = _G.Options.Furiosity,
-                Callback = function (Value)
-                    _G.Options.Furiosity = (Value)
-                    if _G.Options.Furiosity then
-                        startFuriosityBuffLoop() -- Start the buff loop
-                    else
-                        stopFuriosityBuffLoop() -- Stop the buff loop
-                    end
-                end
-            })
-
             local spacialAwareness = miscellaneousTab:CreateToggle({
                 Name = "Spacial Awareness",
                 CurrentValue = _G.Options.SpacialAwareness,
@@ -762,36 +919,6 @@
             })
             
             -- [Scythe GodMode]
-            local isUniversalGodModeActive = false -- Flag to track if Universal God Mode is active
-            local universalGodModeLoop = nil
-            
-            local function activateUniversalGodMode()
-                while isUniversalGodModeActive do
-                    local args = {
-                        [1] = "skil_ting_asd",
-                        [2] = LocalPlayer,
-                        [3] = "scythe_asteroid_reap",
-                        [4] = 1
-                    }
-                    ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("To_Server"):WaitForChild("Handle_Initiate_S"):FireServer(unpack(args))
-                    task.wait(.5)
-                end
-            end
-            
-            local function stopUniversalGodModeLoop()
-                if universalGodModeLoop then
-                    isUniversalGodModeActive = false -- Stop the loop by setting the flag to false
-                    task.wait() -- Yield the current thread so the loop can finish
-                    universalGodModeLoop = nil
-                end
-            end
-            
-            local function startUniversalGodModeLoop()
-                if not universalGodModeLoop then
-                    isUniversalGodModeActive = true -- Set the flag to true to start the loop
-                    universalGodModeLoop = task.spawn(activateUniversalGodMode) -- Start the Universal God Mode loop
-                end
-            end
             
             local universalGodMode = miscellaneousTab:CreateToggle({
                 Name = "Universal God Mode [Requires Scythe Equipped/ 28+ Mas.]",
@@ -814,14 +941,6 @@
                 end
             })
             
-            spawn(function()
-                while task.wait() do
-                    if _G.Options.infbreath then
-                        getrenv()._G:Breath(-100)
-                    end
-                end
-            end)
-            
             local infStamToggle = miscellaneousTab:CreateToggle({
                 Name = "INF Stamina",
                 CurrentValue = false,
@@ -830,111 +949,13 @@
                 end
             })
             
-            spawn(function()
-                while task.wait() do
-                    if _G.Options.infstam then
-                        getrenv()._G:Stamina(-100)
-                    end
-                end
-            end)
 
     -- [ESP]
     local ESP = Window:CreateTab("ESP")
     local ESPSection = ESP:CreateSection("ESP Settings")
-    
-    -- Tables to store ESP labels and drawing objects
-    local ESPLabels = {}
-    local DrawingPool = {}
-    
-    -- Helper function to create or reuse a drawing object
-    local function getDrawingObject()
-        local drawingObject = next(DrawingPool) or Drawing.new("Text")
-        DrawingPool[drawingObject] = nil
-        drawingObject.Visible = false
-        drawingObject.Center = true
-        drawingObject.Outline = true
-        drawingObject.Font = 2
-        drawingObject.Color = Color3.fromRGB(255, 255, 255)
-        drawingObject.Size = 13
-        return drawingObject
-    end
-    
-    -- Helper function to return a drawing object to the pool for reuse
-    local function returnDrawingObject(drawingObject)
-        drawingObject.Visible = false
-        DrawingPool[drawingObject] = true
-    end
-    
-    -- Helper function to update the ESP labels for a player
-    local function updatePlayerESP(player, labelData)
-        local playerESP, playerInfo = labelData.ESP, labelData.Info
-        if player == LocalPlayer then
-            -- Hide ESP labels for the local player
-            playerESP.Visible, playerInfo.Visible = false, false
-        else
-            local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-            if humanoidRootPart then
-                -- Convert 3D position to 2D screen position
-                local position, onScreen = camera:WorldToViewportPoint(humanoidRootPart.Position)
-                local powerValue = ReplicatedStorage["Player_Data"][player.Name].Power.Value
-                local artValue = ReplicatedStorage["Player_Data"][player.Name].Demon_Art.Value
-                local healthValue = workspace[player.Name].Humanoid.Health
-
-                    local playerRace = ReplicatedStorage["Player_Data"][player.Name].Race.Value
-                -- Calculate distance between LocalPlayer and the target player
-                local distance = (Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).magnitude
-    
-                -- Update the ESP label with player information and distance
-                playerESP.Position, playerESP.Visible, playerESP.Text = Vector2.new(position.X, position.Y), onScreen, "Username: " .. player.Name
-                playerInfo.Visible, playerInfo.Text = onScreen, "Health: " .. math.floor(healthValue)
-                playerInfo.Position = Vector2.new(position.X, position.Y + 15)  -- Adjust the position for distance
-                playerInfo.Text = playerInfo.Text .. string.format("\nDistance: %.2f studs", distance)
-                playerInfo.Text = playerInfo.Text .. ((playerRace == 1 or playerRace == 2) and "\nBreathing: " .. powerValue or "")
-                playerInfo.Text = playerInfo.Text .. (playerRace == 3 and "\nBlood Demon Art: " .. artValue or "")
-            else
-                -- Hide ESP labels if the player's character is not available
-                playerESP.Visible, playerInfo.Visible = false, false
-            end
-        end
-    end
-    
-    -- Create ESP labels and start updating them for a new player
-    local function createESP(player)
-        local playerESP, playerInfo = getDrawingObject(), getDrawingObject()
-        local HeartBeat = RunService.Heartbeat:Connect(function()
-            updatePlayerESP(player, ESPLabels[player])
-        end)
-    
-        -- Store the ESP label data for the player
-        ESPLabels[player] = {
-            ESP = playerESP,
-            Info = playerInfo,
-            HeartBeat = HeartBeat
-        }
-    end
-    
-    -- Update all ESP labels for all players
-    local function updateESPLabels()
-        for player, labelData in pairs(ESPLabels) do
-            updatePlayerESP(player, labelData)
-        end
-    end
-    
-    -- Remove ESP labels and stop updating them for a player leaving the game
-    local function removeESP(player)
-        local labelData = ESPLabels[player]
-        if labelData then
-            local playerESP, playerInfo = labelData.ESP, labelData.Info
-            playerESP.Visible, playerInfo.Visible = false, false
-            returnDrawingObject(playerESP)
-            returnDrawingObject(playerInfo)
-            labelData.HeartBeat:Disconnect()
-            ESPLabels[player] = nil
-        end
-    end
 
     Players.PlayerRemoving:Connect(removeESP)
-    
+
     local Toggle = ESP:CreateToggle({
         Name = "Toggle ESP",
         CurrentValue = _G.Options.ESP,
@@ -1143,8 +1164,6 @@
                 MultipleOptions = false,
                 Flag = "TeleportPlaceDropDown", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
                 Callback = function(Option)
-                -- The function that takes place when the selected option is changed
-                -- The variable (Option) is a table of strings for the current selected options
                 selectedPlace = Option[1]
                 end,
             })
@@ -1171,7 +1190,6 @@
             local DestroyGuiButton = Settings:CreateButton({
                 Name = "Destroy GUI",
                 Callback = function()
-                    -- The function that takes place when the button is pressed
                     Rayfield:Destroy()
                 end,
             })
@@ -1182,18 +1200,13 @@
                 Increment = 10,
                 Suffix = "FOV",
                 CurrentValue = 70,
-                Flag = "FOVSlider", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+                Flag = "FOVSlider",
                 Callback = function(Value)
-                -- The function that takes place when the slider changes
-                -- The variable (Value) is a number which correlates to the value the slider is currently at
                 workspace.Camera.FieldOfView = (Value)
                 end,
             })
     end
     -- [End Of Map 2]
-
-
-
 
 
 
@@ -1425,18 +1438,8 @@
                 Flag = "StartAutoCollectChest",
                 Callback = function (Value)
                     _G.Options.AutoCollectChest = (Value)
-                    while _G.Options.AutoCollectChest do
-                        local chest = workspace.Debree:FindFirstChild("Loot_Chest")
-                        
-                        if chest and #chest:WaitForChild("Drops"):GetChildren() > 0 then
-                            local remote = chest:WaitForChild("Add_To_Inventory")
-        
-                            for _,v in next, chest:WaitForChild("Drops"):GetChildren() do
-                                if not ReplicatedStorage["Player_Data"][LocalPlayer.Name].Inventory:FindFirstChild(v.Name, true) then
-                                    remote:InvokeServer(v.Name)
-                                end
-                            end
-                        end
+                    if _G.Options.AutoCollectChest then
+                        AutoCollectChest()
                     end
                 end
             })
@@ -1444,40 +1447,6 @@
             -- [GKA]
             local gkaTab = Window:CreateTab("GKA")
             local gkaSection = gkaTab:CreateSection("Main Global Kill Aura")
-            
-            local isArrowGKAActive = false -- Flag to track if Arrow Global Kill Aura is active
-            local arrowGKALoop = nil
-            
-            local function activateArrowGKA()
-                while isArrowGKAActive do
-                    local args = {
-                        [1] = "arrow_knock_back_damage",
-                        [2] = workspace:WaitForChild(LocalPlayer.Name),
-                        [3] = CFrame.new(3470.03003, 670.609985, -1883.43396, 1, 0, 0, 0, 1, 0, 0, 0, 1),
-                        [4] = workspace:WaitForChild("Mobs"):WaitForChild("Village_1_quest_bandits"):WaitForChild("BanditBoss"):WaitForChild("Nomay Bandit Boss"),
-                        [5] = math.huge,
-                        [6] = math.huge
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("To_Server"):WaitForChild("Handle_Initiate_S_"):InvokeServer(unpack(args))
-                    task.wait(1)
-                end
-            end
-            
-            local function stopArrowGKALoop()
-                if arrowGKALoop then
-                    isArrowGKAActive = false -- Stop the loop by setting the flag to false
-                    task.wait() -- Yield the current thread so the loop can finish
-                    arrowGKALoop = nil
-                end
-            end
-            
-            local function startArrowGKALoop()
-                if not arrowGKALoop then
-                    isArrowGKAActive = true -- Set the flag to true to start the loop
-                    arrowGKALoop = task.spawn(activateArrowGKA) -- Start the Arrow Global Kill Aura loop
-                end
-            end
             
             local arrowGKA = gkaTab:CreateToggle({
                 Name = "Arrow Global Kill Aura [Requires Arrow BDA]",
@@ -1492,64 +1461,27 @@
                 end
             })
             
-            
             -- [Miscellaneous]
             local miscellaneousTab = Window:CreateTab("Miscellaneous")
             local LocalPlayerMainSection = miscellaneousTab:CreateSection("Main Settings")
-            
-            local Label = miscellaneousTab:CreateLabel("Clan Must Start With A Capital Letter")
+
             local Input = miscellaneousTab:CreateInput({
             Name = "Change Clan",
             PlaceholderText = "Type Clan Name",
             RemoveTextAfterFocusLost = true,
             Callback = function(Text)
-            -- The function that takes place when the input is changed
-            -- The variable (Text) is a string for the value in the text box
-                local clan = ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan
-                clan.Value = (Text)
+                ChangeClan(Text)
             end,
             })
+
             local KillPlayerButton = miscellaneousTab:CreateButton({
                 Name = "Kill Character",
                 Callback = function()
-                    -- The function that takes place when the button is pressed
-                        Character.Humanoid.Health = 0
+                    KillCharacter()
                 end,
             })
             
             local LocalPlayerBuffs = miscellaneousTab:CreateSection("Character Buffs & God Modes")
-            
-            local isBuffActive = false -- Flag to track if the buff is currently active
-            local warDrumsBuffLoop = nil
-            
-            local function activateWarDrumsBuff()
-                while isBuffActive do
-                    local args = {
-                        [1] = true
-                    }
-                    ReplicatedStorage.Remotes.war_Drums_remote:FireServer(unpack(args))
-                    task.wait(20) -- Delay for 20 seconds before the next call
-                end
-            end
-            
-            local function stopWarDrumsBuffLoop()
-                if warDrumsBuffLoop then
-                    isBuffActive = false -- Stop the loop by setting the flag to false
-                    task.wait() -- Yield the current thread so the loop can finish
-                    local args = {
-                        [1] = false
-                    }
-                    ReplicatedStorage.Remotes.war_Drums_remote:FireServer(unpack(args))
-                    warDrumsBuffLoop = nil
-                end
-            end
-            
-            local function startWarDrumsBuffLoop()
-                if not warDrumsBuffLoop then
-                    isBuffActive = true -- Set the flag to true to start the loop
-                    warDrumsBuffLoop = task.spawn(activateWarDrumsBuff) -- Start the buff activation loop
-                end 
-            end
             
             local warDrumsBuffToggle = miscellaneousTab:CreateToggle({
                 Name = "Speed & Damage Buff [All Races]",
@@ -1563,38 +1495,6 @@
                     end
                 end
             })
-            
-            local isFuriosityEnabled = false -- Flag to track if the buff is currently active
-            local furiosityBuffLoop = nil
-            
-            local function activateFuriosityBuff()
-                while isFuriosityEnabled do
-                    local args = {
-                        [1] = true
-                    }
-                    ReplicatedStorage.Remotes.clan_furiosity_add:FireServer(unpack(args))
-                    task.wait(22) -- Delay for 22 seconds before the next call
-                end
-            end
-            
-            local function stopFuriosityBuffLoop()
-                if furiosityBuffLoop then
-                    isFuriosityEnabled = false -- Stop the loop by setting the flag to false
-                    task.wait() -- Yield the current thread so the loop can finish
-                    local args = {
-                        [1] = false
-                    }
-                    ReplicatedStorage.Remotes.clan_furiosity_add:FireServer(unpack(args))
-                    furiosityBuffLoop = nil
-                end
-            end
-            
-            local function startFuriosityBuffLoop()
-                if not furiosityBuffLoop then
-                    isFuriosityEnabled = true -- Set the flag to true to start the loop
-                    furiosityBuffLoop = task.spawn(activateFuriosityBuff) -- Start the buff activation loop
-                end 
-            end
             
             local furiosityToggle = miscellaneousTab:CreateToggle({
                 Name = "Furiosity [More Damage / All Races]",
@@ -1654,38 +1554,7 @@
                     end
                 end
             })
-            
-            local isUniversalGodModeActive = false -- Flag to track if Universal God Mode is active
-            local universalGodModeLoop = nil
-            
-            local function activateUniversalGodMode()
-                while isUniversalGodModeActive do
-                    local args = {
-                        [1] = "skil_ting_asd",
-                        [2] = LocalPlayer,
-                        [3] = "scythe_asteroid_reap",
-                        [4] = 1
-                    }
-                    ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("To_Server"):WaitForChild("Handle_Initiate_S"):FireServer(unpack(args))
-                    task.wait(.4)
-                end
-            end
-            
-            local function stopUniversalGodModeLoop()
-                if universalGodModeLoop then
-                    isUniversalGodModeActive = false -- Stop the loop by setting the flag to false
-                    task.wait() -- Yield the current thread so the loop can finish
-                    universalGodModeLoop = nil
-                end
-            end
-            
-            local function startUniversalGodModeLoop()
-                if not universalGodModeLoop then
-                    isUniversalGodModeActive = true -- Set the flag to true to start the loop
-                    universalGodModeLoop = task.spawn(activateUniversalGodMode) -- Start the Universal God Mode loop
-                end
-            end
-            
+            --[Scythe God Mode]
             local universalGodMode = miscellaneousTab:CreateToggle({
                 Name = "Universal God Mode [Requires Scythe Equipped/ 28+ Mas.]",
                 CurrentValue = _G.Options.UniversalGodMode,
@@ -1707,14 +1576,6 @@
                 end
             })
             
-            spawn(function()
-                while task.wait() do
-                    if _G.Options.infbreath then
-                        getrenv()._G:Breath(-100)
-                    end
-                end
-            end)
-            
             local infStamToggle = miscellaneousTab:CreateToggle({
                 Name = "INF Stamina",
                 CurrentValue = false,
@@ -1722,14 +1583,6 @@
                     _G.Options.infstam = (Value)
                 end
             })
-            
-            spawn(function()
-                while task.wait() do
-                    if _G.Options.infstam then
-                        getrenv()._G:Stamina(-100)
-                    end
-                end
-            end)
             
             local miscellaneousTabBDASPINS = miscellaneousTab:CreateSection("Demon Art Spins")
 
@@ -1746,8 +1599,6 @@
             }
             
             local bdaNames = {}
-            local chosenBDA = nil
-            local stopLoop = false -- Variable to control the loop
             
             -- Use ipairs instead of pairs for ordered insertion
             for _, bdaName in ipairs(bdas) do
@@ -1780,20 +1631,6 @@
                 end,
             })
 
-            function checkDemonArtValue()
-                while not stopLoop do
-                    if chosenBDA == ReplicatedStorage["Player_Data"][LocalPlayer.Name].Demon_Art.Value then
-                        autoBDASpinToggle:Set(false) -- Set the toggle to false when the desired BDA is obtained
-                        stopLoop = false
-                        break -- Exit the loop when the desired BDA is obtained
-                    end
-                    
-                    local args = {
-                        [1] = "check_can_spin_demon_art"
-                    }
-                    ReplicatedStorage.Remotes.To_Server.Handle_Initiate_S_:InvokeServer(unpack(args))
-                end
-            end
 
             local miscellaneousTabBDASPINS = miscellaneousTab:CreateSection("Information")
 
@@ -1818,101 +1655,9 @@
         -- [ESP]
         local ESP = Window:CreateTab("ESP")
         local ESPSection = ESP:CreateSection("ESP Settings")
-        
-        -- Tables to store ESP labels and drawing objects
-        local ESPLabels = {}
-        local DrawingPool = {}
-        
-        -- Helper function to create or reuse a drawing object
-        local function getDrawingObject()
-            local drawingObject = next(DrawingPool) or Drawing.new("Text")
-            DrawingPool[drawingObject] = nil
-            drawingObject.Visible = false
-            drawingObject.Center = true
-            drawingObject.Outline = true
-            drawingObject.Font = 2
-            drawingObject.Color = Color3.fromRGB(255, 255, 255)
-            drawingObject.Size = 13
-            return drawingObject
-        end
-        
-        -- Helper function to return a drawing object to the pool for reuse
-        local function returnDrawingObject(drawingObject)
-            drawingObject.Visible = false
-            DrawingPool[drawingObject] = true
-        end
-        
-        -- Helper function to update the ESP labels for a player
-        local function updatePlayerESP(player, labelData)
-            local playerESP, playerInfo = labelData.ESP, labelData.Info
-            if player == LocalPlayer then
-                -- Hide ESP labels for the local player
-                playerESP.Visible, playerInfo.Visible = false, false
-            else
-                local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-                if humanoidRootPart then
-                    -- Convert 3D position to 2D screen position
-                    local position, onScreen = camera:WorldToViewportPoint(humanoidRootPart.Position)
-                    local powerValue = ReplicatedStorage["Player_Data"][player.Name].Power.Value
-                    local artValue = ReplicatedStorage["Player_Data"][player.Name].Demon_Art.Value
-                    local healthValue = workspace[player.Name].Humanoid.Health
-    
-                    local playerRace = ReplicatedStorage["Player_Data"][player.Name].Race.Value
-                    -- Calculate distance between LocalPlayer and the target player
-                    local distance = (Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).magnitude
-        
-                    -- Update the ESP label with player information and distance
-                    playerESP.Position, playerESP.Visible, playerESP.Text = Vector2.new(position.X, position.Y), onScreen, "Username: " .. player.Name
-                    playerInfo.Visible, playerInfo.Text = onScreen, "Health: " .. math.floor(healthValue)
-                    playerInfo.Position = Vector2.new(position.X, position.Y + 15)  -- Adjust the position for distance
-                    playerInfo.Text = playerInfo.Text .. string.format("\nDistance: %.2f studs", distance)
-                    playerInfo.Text = playerInfo.Text .. ((playerRace == 1 or playerRace == 2) and "\nBreathing: " .. powerValue or "")
-                    playerInfo.Text = playerInfo.Text .. (playerRace == 3 and "\nBlood Demon Art: " .. artValue or "")
-                else
-                    -- Hide ESP labels if the player's character is not available
-                    playerESP.Visible, playerInfo.Visible = false, false
-                end
-            end
-        end
-        
-        -- Create ESP labels and start updating them for a new player
-        local function createESP(player)
-            local playerESP, playerInfo = getDrawingObject(), getDrawingObject()
-            local HeartBeat = RunService.Heartbeat:Connect(function()
-                updatePlayerESP(player, ESPLabels[player])
-            end)
-        
-            -- Store the ESP label data for the player
-            ESPLabels[player] = {
-                ESP = playerESP,
-                Info = playerInfo,
-                HeartBeat = HeartBeat
-            }
-        end
-        
-        -- Update all ESP labels for all players
-        local function updateESPLabels()
-            for player, labelData in pairs(ESPLabels) do
-                updatePlayerESP(player, labelData)
-            end
-        end
-        
-        -- Remove ESP labels and stop updating them for a player leaving the game
-        local function removeESP(player)
-            local labelData = ESPLabels[player]
-            if labelData then
-                local playerESP, playerInfo = labelData.ESP, labelData.Info
-                playerESP.Visible, playerInfo.Visible = false, false
-                returnDrawingObject(playerESP)
-                returnDrawingObject(playerInfo)
-                labelData.HeartBeat:Disconnect()
-                ESPLabels[player] = nil
-            end
-        end
-        
-        -- Connect events for player joining and leaving
-        Players.PlayerRemoving:Connect(removeESP)
-        
+
+         Players.PlayerRemoving:Connect(removeESP)
+
         local Toggle = ESP:CreateToggle({
         Name = "Toggle ESP",
         CurrentValue = _G.Options.ESP,
