@@ -942,6 +942,22 @@
                 end
             })
 
+                infBreathingToggle = miscellaneousTab:CreateToggle({
+                Name = "INF Breathing",
+                CurrentValue = false,
+                Callback = function (Value)
+                    _G.Options.infbreath = (Value)
+                end
+            })
+            
+                infStamToggle = miscellaneousTab:CreateToggle({
+                Name = "INF Stamina",
+                CurrentValue = false,
+                Callback = function (Value)
+                    _G.Options.infstam = (Value)
+                end
+            })
+
             local miscellaneousTabBDASPINS = miscellaneousTab:CreateSection("Information")
 
             getBreathingInfo = miscellaneousTab:CreateButton({
@@ -959,22 +975,6 @@
                     local demonProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].DemonProgress["1"].Value
                     local neededDemonProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].DemonProgress["2"].Value
                     game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Demon Progress: " .. demonProgress .. "/" .. neededDemonProgress; Duration = 10; })
-                end
-            })
-            
-                infBreathingToggle = miscellaneousTab:CreateToggle({
-                Name = "INF Breathing",
-                CurrentValue = false,
-                Callback = function (Value)
-                    _G.Options.infbreath = (Value)
-                end
-            })
-            
-                infStamToggle = miscellaneousTab:CreateToggle({
-                Name = "INF Stamina",
-                CurrentValue = false,
-                Callback = function (Value)
-                    _G.Options.infstam = (Value)
                 end
             })
             
