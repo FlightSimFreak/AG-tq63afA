@@ -32,6 +32,7 @@
 
 
     local camera = workspace.CurrentCamera
+    local Player_Data = ReplicatedStorage["Player_Data"][LocalPlayer.Name]
 
     local function onCharacterAdded(character)
         -- This function will be called whenever the player's character is added or changed
@@ -115,11 +116,11 @@
                if humanoidRootPart then
                    -- Convert 3D position to 2D screen position
                    local position, onScreen = camera:WorldToViewportPoint(humanoidRootPart.Position)
-                   local powerValue = ReplicatedStorage["Player_Data"][player.Name].Power.Value
-                   local artValue = ReplicatedStorage["Player_Data"][player.Name].Demon_Art.Value
+                   local powerValue = Player_Data[player.Name].Power.Value
+                   local artValue = Player_Data[player.Name].Demon_Art.Value
                    local healthValue = workspace[player.Name].Humanoid.Health
    
-                   local playerRace = ReplicatedStorage["Player_Data"][player.Name].Race.Value
+                   local playerRace = Player_Data[player.Name].Race.Value
                    -- Calculate distance between LocalPlayer and the target player
                    local distance = (Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).magnitude
        
@@ -176,7 +177,7 @@
 
     local function checkDemonArtValue()
         while not stopLoop do
-            if chosenBDA == ReplicatedStorage["Player_Data"][LocalPlayer.Name].Demon_Art.Value then
+            if chosenBDA == Player_Data.Demon_Art.Value then
                 autoBDASpinToggle:Set(false) -- Set the toggle to false when the desired BDA is obtained
                 _G.Options.AutoSpinBDA = false
                 break -- Exit the loop when the desired BDA is obtained
@@ -213,7 +214,7 @@
                 local remote = chest:WaitForChild("Add_To_Inventory")
 
                 for _,v in next, chest:WaitForChild("Drops"):GetChildren() do
-                    if not ReplicatedStorage["Player_Data"][LocalPlayer.Name].Inventory:FindFirstChild(v.Name, true) then
+                    if not Player_Data.Inventory:FindFirstChild(v.Name, true) then
                         remote:InvokeServer(v.Name)
                     end
                 end
@@ -223,7 +224,7 @@
     end
 
     local function ChangeClan(Text)
-        local clan = ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan
+        local clan = Player_Data.Clan
         clan.Value = (Text)
     end
 
@@ -435,8 +436,8 @@
             local spinForUzui = Home:CreateButton({
                 Name = "Auto Spin For Uzui",
                 Callback = function()
-                    while ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan.Value ~= "Uzui" do
-                        if ReplicatedStorage["Player_Data"][LocalPlayer.Name].Spins.Value <= 50 then
+                    while Player_Data.Clan.Value ~= "Uzui" do
+                        if Player_Data.Spins.Value <= 50 then
                             break
                         end
 
@@ -453,8 +454,8 @@
             local spinForKamado = Home:CreateButton({
                 Name = "Auto Spin For Kamado",
                 Callback = function()
-                    while ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan.Value ~= "Kamado" do
-                        if ReplicatedStorage["Player_Data"][LocalPlayer.Name].Spins.Value <= 50 then
+                    while Player_Data.Clan.Value ~= "Kamado" do
+                        if Player_Data.Spins.Value <= 50 then
                             break
                         end
                         local args = {
@@ -470,8 +471,8 @@
             local spinForAgatsuma = Home:CreateButton({
                 Name = "Auto Spin For Agatsuma",
                 Callback = function()
-                    while ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan.Value ~= "Agatsuma" do
-                        if ReplicatedStorage["Player_Data"][LocalPlayer.Name].Spins.Value <= 50 then
+                    while Player_Data.Clan.Value ~= "Agatsuma" do
+                        if Player_Data.Spins.Value <= 50 then
                             break
                         end
                         local args = {
@@ -487,8 +488,8 @@
             local spinForRengoku = Home:CreateButton({
                 Name = "Auto Spin For Rengoku",
                 Callback = function()
-                    while ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan.Value ~= "Rengoku" do
-                        if ReplicatedStorage["Player_Data"][LocalPlayer.Name].Spins.Value <= 50 then
+                    while Player_Data.Clan.Value ~= "Rengoku" do
+                        if Player_Data.Spins.Value <= 50 then
                             break
                         end
                         local args = {
@@ -507,8 +508,8 @@
             local spinForTokito = Home:CreateButton({
                 Name = "Auto Spin For Tokito",
                 Callback = function()
-                    while ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan.Value ~= "Tokito" do
-                        if ReplicatedStorage["Player_Data"][LocalPlayer.Name].Spins.Value <= 50 then
+                    while Player_Data.Clan.Value ~= "Tokito" do
+                        if Player_Data.Spins.Value <= 50 then
                             break
                         end
                         local args = {
@@ -524,8 +525,8 @@
             local spinForHashibira = Home:CreateButton({
                 Name = "Auto Spin For Hashibira",
                 Callback = function()
-                    while ReplicatedStorage["Player_Data"][LocalPlayer.Name].Clan.Value ~= "Hashibira" do
-                        if ReplicatedStorage["Player_Data"][LocalPlayer.Name].Spins.Value <= 50 then
+                    while Player_Data.Clan.Value ~= "Hashibira" do
+                        if Player_Data.Spins.Value <= 50 then
                             break
                         end
                         local args = {
@@ -553,7 +554,7 @@
             
             end
 
-            local skill_module = require(game:GetService("ReplicatedStorage").Modules.Server["Skills_Modules_Handler"])
+    local skill_module = require(game:GetService("ReplicatedStorage").Modules.Server["Skills_Modules_Handler"])
 
     hookfunction(skill_module.Kick, function()
         return nil
@@ -963,8 +964,8 @@
             getBreathingInfo = miscellaneousTab:CreateButton({
                 Name = "Breathing Progress",
                 Callback = function ()
-                    local breathingProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].BreathingProgress["1"].Value
-                    local neededBreathingProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].BreathingProgress["2"].Value
+                    local breathingProgress = Player_Data.BreathingProgress["1"].Value
+                    local neededBreathingProgress = Player_Data.BreathingProgress["2"].Value
                     game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Breathing Progress: " .. breathingProgress .. "/" .. neededBreathingProgress; Duration = 10; })
                 end
             })
@@ -972,8 +973,8 @@
             getDemonInfo = miscellaneousTab:CreateButton({
                 Name = "Demon Progress",
                 Callback = function ()
-                    local demonProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].DemonProgress["1"].Value
-                    local neededDemonProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].DemonProgress["2"].Value
+                    local demonProgress = Player_Data.DemonProgress["1"].Value
+                    local neededDemonProgress = Player_Data.DemonProgress["2"].Value
                     game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Demon Progress: " .. demonProgress .. "/" .. neededDemonProgress; Duration = 10; })
                 end
             })
@@ -1527,8 +1528,8 @@
             getBreathingInfo = miscellaneousTab:CreateButton({
                 Name = "Breathing Progress",
                 Callback = function ()
-                    local breathingProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].BreathingProgress["1"].Value
-                    local neededBreathingProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].BreathingProgress["2"].Value
+                    local breathingProgress = Player_Data.BreathingProgress["1"].Value
+                    local neededBreathingProgress = Player_Data.BreathingProgress["2"].Value
                     game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Breathing Progress: " .. breathingProgress .. "/" .. neededBreathingProgress; Duration = 10; })
                 end
             })
@@ -1536,8 +1537,8 @@
             getDemonInfo = miscellaneousTab:CreateButton({
                 Name = "Demon Progress",
                 Callback = function ()
-                    local demonProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].DemonProgress["1"].Value
-                    local neededDemonProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].DemonProgress["2"].Value
+                    local demonProgress = Player_Data.DemonProgress["1"].Value
+                    local neededDemonProgress = Player_Data.DemonProgress["2"].Value
                     game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Demon Progress: " .. demonProgress .. "/" .. neededDemonProgress; Duration = 10; })
                 end
             })
