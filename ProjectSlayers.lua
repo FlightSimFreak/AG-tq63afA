@@ -10,6 +10,22 @@
     local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
     local current_tween
+    local getBreathingInfo
+    local getDemonInfo
+    local autoBDASpinToggle
+    local ESPToggle
+    local autoCollectChestToggle
+    local infBreathingToggle
+    local infStamToggle
+    local startDailySpin
+    local startFarmButton
+    local arrowGKA
+    local universalGodMode
+    local warDrumsBuffToggle
+    local furiosityToggle
+    local spacialAwareness
+    local semiGodModeToggle
+
 
     local camera = workspace.CurrentCamera
 
@@ -153,13 +169,12 @@
        end
 
        local chosenBDA = nil
-       local stopLoop = false -- Variable to control the loop
 
-    function checkDemonArtValue()
+    local function checkDemonArtValue()
         while not stopLoop do
             if chosenBDA == ReplicatedStorage["Player_Data"][LocalPlayer.Name].Demon_Art.Value then
                 autoBDASpinToggle:Set(false) -- Set the toggle to false when the desired BDA is obtained
-                stopLoop = false
+                _G.Options.AutoSpinBDA = false
                 break -- Exit the loop when the desired BDA is obtained
             end
             
@@ -397,7 +412,7 @@
                 end 
             end
             
-            local startDailySpin = Home:CreateToggle({
+            startDailySpin = Home:CreateToggle({
                 Name = "Auto Daily Spin",
                 CurrentValue = _G.Options.AutoDailySpin,
                 Flag = "StartAutoDailySpin",
@@ -757,7 +772,7 @@
                 end,
             })
             
-            local startFarmButton = Home:CreateToggle({
+                startFarmButton = Home:CreateToggle({
                 Name = "Kill Aura",
                 CurrentValue = false,
                 Flag = "StartFarmButton", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
@@ -784,7 +799,7 @@
                 end,
             })
 
-            local autoCollectChestToggle = Home:CreateToggle({
+            autoCollectChestToggle = Home:CreateToggle({
                 Name = "Auto Collect Chest",
                 CurrentValue = _G.Options.AutoCollectChest,
                 Flag = "StartAutoCollectChest",
@@ -800,7 +815,7 @@
             local gkaTab = Window:CreateTab("GKA")
             local gkaSection = gkaTab:CreateSection("Main Global Kill Aura")
             
-            local arrowGKA = gkaTab:CreateToggle({
+            arrowGKA = gkaTab:CreateToggle({
                 Name = "Arrow Global Kill Aura [Requires Arrow BDA]",
                 CurrentValue = _G.Options.ArrowGKA,
                 Callback = function (Value)
@@ -838,7 +853,7 @@
 
                         -- [Scythe GodMode]
             
-                        local universalGodMode = miscellaneousTab:CreateToggle({
+                            universalGodMode = miscellaneousTab:CreateToggle({
                             Name = "Universal God Mode [Requires Scythe Equipped/ 28+ Mas.]",
                             CurrentValue = _G.Options.UniversalGodMode,
                             Callback = function(Value)
@@ -851,7 +866,7 @@
                             end
                         })
             
-            local warDrumsBuffToggle = miscellaneousTab:CreateToggle({
+                warDrumsBuffToggle = miscellaneousTab:CreateToggle({
                 Name = "Speed & Damage Buff [All Races]",
                 CurrentValue = _G.Options.SpeedandDamageBuff,
                 Callback = function (Value)
@@ -864,7 +879,7 @@
                 end
             })
 
-            local furiosityToggle = miscellaneousTab:CreateToggle({
+                furiosityToggle = miscellaneousTab:CreateToggle({
                 Name = "Furiosity [More Damage / All Races]",
                 CurrentValue = _G.Options.Furiosity,
                 Callback = function (Value)
@@ -877,7 +892,7 @@
                 end
             })
             
-            local spacialAwareness = miscellaneousTab:CreateToggle({
+                spacialAwareness = miscellaneousTab:CreateToggle({
                 Name = "Spacial Awareness",
                 CurrentValue = _G.Options.SpacialAwareness,
                 Callback = function (Value)
@@ -900,7 +915,7 @@
                 end
             })
 
-            local semiGodModeToggle = miscellaneousTab:CreateToggle({
+                semiGodModeToggle = miscellaneousTab:CreateToggle({
                 Name = "Semi God Mode [All Races]",
                 CurrentValue = _G.Options.SemiGodMode,
                 Callback = function (Value)
@@ -925,7 +940,7 @@
 
             local miscellaneousTabBDASPINS = miscellaneousTab:CreateSection("Information")
 
-            local getBreathingInfo = miscellaneousTab:CreateButton({
+            getBreathingInfo = miscellaneousTab:CreateButton({
                 Name = "Breathing Progress",
                 Callback = function ()
                     local breathingProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].BreathingProgress["1"].Value
@@ -934,7 +949,7 @@
                 end
             })
 
-            local getDemonInfo = miscellaneousTab:CreateButton({
+            getDemonInfo = miscellaneousTab:CreateButton({
                 Name = "Demon Progress",
                 Callback = function ()
                     local demonProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].DemonProgress["1"].Value
@@ -943,7 +958,7 @@
                 end
             })
             
-            local infBreathingToggle = miscellaneousTab:CreateToggle({
+                infBreathingToggle = miscellaneousTab:CreateToggle({
                 Name = "INF Breathing",
                 CurrentValue = false,
                 Callback = function (Value)
@@ -951,7 +966,7 @@
                 end
             })
             
-            local infStamToggle = miscellaneousTab:CreateToggle({
+                infStamToggle = miscellaneousTab:CreateToggle({
                 Name = "INF Stamina",
                 CurrentValue = false,
                 Callback = function (Value)
@@ -966,7 +981,7 @@
 
     Players.PlayerRemoving:Connect(removeESP)
 
-    local Toggle = ESP:CreateToggle({
+        ESPToggle = ESP:CreateToggle({
         Name = "Toggle ESP",
         CurrentValue = _G.Options.ESP,
         Callback = function(Value)
@@ -1005,179 +1020,39 @@
             local TeleportSection = Teleport:CreateSection("Teleport")
             
             local teleportOptions = {
-                ["Nomay Village"] = function()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 22675.3963009,
-                        [3] = "Nomay Village"
-                    }
-            
-                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                end,
-            
-                ["Cave 1"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 22808.3569176,
-                        [3] = "Cave 1"
-                    }
-                    
-                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Frozen Lake"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 22909.3037934,
-                        [3] = "Frozen Lake"
-                    }
-                    
-                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Village 2"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 22936.3472706,
-                        [3] = "Village 2"
-                    }
-                    
-                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Mist Trainer Location"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 23791.931781699997,
-                        [3] = "Mist trainer location"
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Wop's Trainings Grounds"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 22972.2790373,
-                        [3] = "Wop's training grounds"
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Beast Cave"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 22497.1703685,
-                        [3] = "Beast Cave"
-                    }
-                    
-                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Wop City"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 23213.6518868,
-                        [3] = "Wop City"
-                    }
-                    
-                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Mugen Train Station"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 23243.3612639,
-                        [3] = "Mugen Train Station"
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Akeza Cave"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 23278.7101263,
-                        [3] = "Akeza Cave"
-                    }
-                    
-                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Cave 2"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 22869.9446229,
-                        [3] = "Cave 2"
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Sound Cave"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 23309.3081049,
-                        [3] = "Sound Cave"
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Snowy Place"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 23341.4434868,
-                        [3] = "Snowy Place"
-                    }
-                    
-                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Devourers Jaw"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 23371.9606183,
-                        [3] = "Devourers Jaw"
-                    }
-                    
-                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
+                ["Nomay Village"] = {22675.3963009, "Nomay Village"},
+                ["Cave 1"] = {22808.3569176, "Cave 1"},
+                ["Frozen Lake"] = {22909.3037934, "Frozen Lake"},
+                ["Village 2"] = {22936.3472706, "Village 2"},
+                ["Mist Trainer Location"] = {23791.931781699997, "Mist Trainer Location"},
+                ["Wop's Trainings Grounds"] = {22972.2790373, "Wop's Trainings Grounds"},
+                ["Beast Cave"] = {22497.1703685, "Beast Cave"},
+                ["Wop City"] = {23213.6518868, "Wop City"},
+                ["Mugen Train Station"] = {23243.3612639, "Mugen Train Station"},
+                ["Akeza Cave"] = {23278.7101263, "Akeza Cave"},
+                ["Cave 2"] = {22869.9446229, "Cave 2"},
+                ["Sound Cave"] = {23309.3081049, "Sound Cave"},
+                ["Snowy Place"] = {23341.4434868, "Snowy Place"},
+                ["Devourers Jaw"] = {23371.9606183, "Devourers Jaw"},
             }
             
             local selectedPlace = "Nomay Village"
             
-            local placeNames = {} -- Create an empty table to store the place names
-            
+            local placeNames = {}
             for placeName, _ in pairs(teleportOptions) do
-            table.insert(placeNames, placeName) -- Add each place name to the placeNames table
+                table.insert(placeNames, placeName)
             end
             
             local TeleportPlace = Teleport:CreateDropdown({
-            Name = "Select Place",
+                Name = "Select Place",
                 Options = placeNames,
                 CurrentOption = {"Nomay Village"},
                 MultipleOptions = false,
-                Flag = "TeleportPlaceDropDown", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+                Flag = "TeleportPlaceDropDown",
                 Callback = function(Option)
-                selectedPlace = Option[1]
+                    selectedPlace = Option[1]
                 end,
             })
-            
             
             local TeleportButton = Teleport:CreateButton({
                 Name = "Teleport",
@@ -1186,12 +1061,15 @@
                         return
                     end
             
-                    local teleportFunction = teleportOptions[selectedPlace]
-                    if teleportFunction then
-                        teleportFunction() -- Execute the selected teleport function
-                    end
+                    local teleportData = teleportOptions[selectedPlace]
+                    local args = {
+                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                        [2] = teleportData[1],
+                        [3] = teleportData[2],
+                    }
+                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
                 end,
-            })
+            })            
             
             -- [GUI SETTINGS]
             local Settings = Window:CreateTab("Settings")
@@ -1627,17 +1505,14 @@
                 end,
             })
             
-            local autoBDASpinToggle = miscellaneousTab:CreateToggle({
+            autoBDASpinToggle = miscellaneousTab:CreateToggle({
                 Name = "Auto Blood Demon Art Spin",
                 CurrentValue = _G.Options.AutoSpinBDA,
                 Flag = "StartAutoBDASpin",
                 Callback = function(value)
                     _G.Options.AutoSpinBDA = (value)
                     if _G.Options.AutoSpinBDA then
-                        stopLoop = false -- Ensure the loop is not stopped initially
                         checkDemonArtValue()
-                    else
-                        stopLoop = true -- Set the loop control variable to true to stop the loop
                     end
                 end,
             })
@@ -1645,7 +1520,7 @@
 
             local miscellaneousTabBDASPINS = miscellaneousTab:CreateSection("Information")
 
-            local getBreathingInfo = miscellaneousTab:CreateButton({
+            getBreathingInfo = miscellaneousTab:CreateButton({
                 Name = "Breathing Progress",
                 Callback = function ()
                     local breathingProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].BreathingProgress["1"].Value
@@ -1654,7 +1529,7 @@
                 end
             })
 
-            local getDemonInfo = miscellaneousTab:CreateButton({
+            getDemonInfo = miscellaneousTab:CreateButton({
                 Name = "Demon Progress",
                 Callback = function ()
                     local demonProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].DemonProgress["1"].Value
@@ -1667,9 +1542,9 @@
         local ESP = Window:CreateTab("ESP")
         local ESPSection = ESP:CreateSection("ESP Settings")
 
-         Players.PlayerRemoving:Connect(removeESP)
+        Players.PlayerRemoving:Connect(removeESP)
 
-        local Toggle = ESP:CreateToggle({
+        ESPToggle = ESP:CreateToggle({
         Name = "Toggle ESP",
         CurrentValue = _G.Options.ESP,
         Callback = function(Value)
@@ -1708,171 +1583,38 @@
             local TeleportSection = Teleport:CreateSection("Teleport")
 
             local teleportOptions = {
-                ["Kiribating Village"] = function()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 36195.927004699995,
-                        [3] = "Kiribating Village"
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-        
-                end,
-            
-                ["Zapiwara Cave"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 36369.907926,
-                        [3] = "Zapiwara Cave"
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))                
-                    
-                end,
-            
-                ["Butterfly Mansion"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 36395.2812183,
-                        [3] = "Butterfly Mension"
-                    }
-                    
-                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))                
-                    
-                end,
-            
-                ["Zapiwara Mountain"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 36422.1468954,
-                        [3] = "Zapiwara Mountain"
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Ushumaru Village"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 36462.9695794,
-                        [3] = "Ushumaru Village"
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))                
-                    
-                end,
-            
-                ["Waroru Cave"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 36484.8315136,
-                        [3] = "Waroru Cave"
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))   
-                                
-                end,
-            
-                ["Abubu Cave"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 36512.4001561,
-                        [3] = "Abubu Cave"
-                    }
-                    
-                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Final Selection"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 36540.8372207,
-                        [3] = "Final Selection"
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))  
-                    
-                end,
-            
-                ["Ouwbayashi Home"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 36566.7650285,
-                        [3] = "Ouwbayashi Home"
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))                
-                    
-                end,
-            
-                ["Wind Trainer"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 36592.2484425,
-                        [3] = "Wind Trainer"
-                    }
-                    
-                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))                
-                    
-                end,
-            
-                ["Dangerous Woods"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 36621.7353394,
-                        [3] = "Dangerous Woods"
-                    }
-                    
-                ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Slasher Demon"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 36654.390417999995,
-                        [3] = "Slasher Demon"
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
-            
-                ["Dungeon"] = function ()
-                    local args = {
-                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
-                        [2] = 36673.498631099996,
-                        [3] = "Dungeon"
-                    }
-                    
-                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
-                    
-                end,
+                ["Kiribating Village"] = {36195.927004699995, "Kiribating Village"},
+                ["Zapiwara Cave"] = {36369.907926, "Zapiwara Cave"},
+                ["Butterfly Mansion"] = {36395.2812183, "Butterfly Mansion"},
+                ["Zapiwara Mountain"] = {36422.1468954, "Zapiwara Mountain"},
+                ["Ushumaru Village"] = {36462.9695794, "Ushumaru Village"},
+                ["Waroru Cave"] = {36484.8315136, "Waroru Cave"},
+                ["Abubu Cave"] = {36512.4001561, "Abubu Cave"},
+                ["Final Selection"] = {36540.8372207, "Final Selection"},
+                ["Ouwbayashi Home"] = {36566.7650285, "Ouwbayashi Home"},
+                ["Wind Trainer"] = {36592.2484425, "Wind Trainer"},
+                ["Dangerous Woods"] = {36621.7353394, "Dangerous Woods"},
+                ["Slasher Demon"] = {36654.390417999995, "Slasher Demon"},
+                ["Dungeon"] = {36673.498631099996, "Dungeon"},
             }
             
             local selectedPlace = "Kiribating Village"
             
-            local placeNames = {} -- Create an empty table to store the place names
-            
+            local placeNames = {}
             for placeName, _ in pairs(teleportOptions) do
-            table.insert(placeNames, placeName) -- Add each place name to the placeNames table
+                table.insert(placeNames, placeName)
             end
             
             local TeleportPlace = Teleport:CreateDropdown({
-            Name = "Select Place",
+                Name = "Select Place",
                 Options = placeNames,
                 CurrentOption = {"Kiribating Village"},
                 MultipleOptions = false,
-                Flag = "TeleportPlaceDropDown", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+                Flag = "TeleportPlaceDropDown",
                 Callback = function(Option)
-                -- The function that takes place when the selected option is changed
-                -- The variable (Option) is a table of strings for the current selected options
-                selectedPlace = Option[1]
+                    selectedPlace = Option[1]
                 end,
             })
-            
             
             local TeleportButton = Teleport:CreateButton({
                 Name = "Teleport",
@@ -1881,10 +1623,13 @@
                         return
                     end
             
-                    local teleportFunction = teleportOptions[selectedPlace]
-                    if teleportFunction then
-                        teleportFunction() -- Execute the selected teleport function
-                    end
+                    local teleportData = teleportOptions[selectedPlace]
+                    local args = {
+                        [1] = "Players.Kekkai_Sensen11.PlayerGui.Npc_Dialogue.Guis.ScreenGui.LocalScript",
+                        [2] = teleportData[1],
+                        [3] = teleportData[2],
+                    }
+                    ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
                 end,
             })
 
