@@ -835,6 +835,21 @@
             })
             
             local LocalPlayerBuffs = miscellaneousTab:CreateSection("Character Buffs & God Modes")
+
+                        -- [Scythe GodMode]
+            
+                        local universalGodMode = miscellaneousTab:CreateToggle({
+                            Name = "Universal God Mode [Requires Scythe Equipped/ 28+ Mas.]",
+                            CurrentValue = _G.Options.UniversalGodMode,
+                            Callback = function(Value)
+                                _G.Options.UniversalGodMode = (Value)
+                                if _G.Options.UniversalGodMode then
+                                    startUniversalGodModeLoop() -- Start the Universal God Mode loop
+                                else
+                                    stopUniversalGodModeLoop() -- Stop the Universal God Mode loop
+                                end
+                            end
+                        })
             
             local warDrumsBuffToggle = miscellaneousTab:CreateToggle({
                 Name = "Speed & Damage Buff [All Races]",
@@ -845,6 +860,19 @@
                         startWarDrumsBuffLoop() -- Start the buff loop
                     else
                         stopWarDrumsBuffLoop() -- Stop the buff loop
+                    end
+                end
+            })
+
+            local furiosityToggle = miscellaneousTab:CreateToggle({
+                Name = "Furiosity [More Damage / All Races]",
+                CurrentValue = _G.Options.Furiosity,
+                Callback = function (Value)
+                    _G.Options.Furiosity = (Value)
+                    if _G.Options.Furiosity then
+                        startFuriosityBuffLoop() -- Start the buff loop
+                    else
+                        stopFuriosityBuffLoop() -- Stop the buff loop
                     end
                 end
             })
@@ -912,21 +940,6 @@
                     local demonProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].DemonProgress["1"].Value
                     local neededDemonProgress = ReplicatedStorage["Player_Data"][LocalPlayer.Name].DemonProgress["2"].Value
                     game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Demon Progress: " .. demonProgress .. "/" .. neededDemonProgress; Duration = 10; })
-                end
-            })
-            
-            -- [Scythe GodMode]
-            
-            local universalGodMode = miscellaneousTab:CreateToggle({
-                Name = "Universal God Mode [Requires Scythe Equipped/ 28+ Mas.]",
-                CurrentValue = _G.Options.UniversalGodMode,
-                Callback = function(Value)
-                    _G.Options.UniversalGodMode = (Value)
-                    if _G.Options.UniversalGodMode then
-                        startUniversalGodModeLoop() -- Start the Universal God Mode loop
-                    else
-                        stopUniversalGodModeLoop() -- Stop the Universal God Mode loop
-                    end
                 end
             })
             
@@ -1479,6 +1492,20 @@
             })
             
             local LocalPlayerBuffs = miscellaneousTab:CreateSection("Character Buffs & God Modes")
+
+             --[Scythe God Mode]
+             local universalGodMode = miscellaneousTab:CreateToggle({
+                Name = "Universal God Mode [Requires Scythe Equipped/ 28+ Mas.]",
+                CurrentValue = _G.Options.UniversalGodMode,
+                Callback = function(Value)
+                    _G.Options.UniversalGodMode = (Value)
+                    if _G.Options.UniversalGodMode then
+                        startUniversalGodModeLoop() -- Start the Universal God Mode loop
+                    else
+                        stopUniversalGodModeLoop() -- Stop the Universal God Mode loop
+                    end
+                end
+            })
             
             local warDrumsBuffToggle = miscellaneousTab:CreateToggle({
                 Name = "Speed & Damage Buff [All Races]",
@@ -1548,19 +1575,6 @@
                         
                         ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("regeneration_breathing_remote"):FireServer(unpack(args))
                         
-                    end
-                end
-            })
-            --[Scythe God Mode]
-            local universalGodMode = miscellaneousTab:CreateToggle({
-                Name = "Universal God Mode [Requires Scythe Equipped/ 28+ Mas.]",
-                CurrentValue = _G.Options.UniversalGodMode,
-                Callback = function(Value)
-                    _G.Options.UniversalGodMode = (Value)
-                    if _G.Options.UniversalGodMode then
-                        startUniversalGodModeLoop() -- Start the Universal God Mode loop
-                    else
-                        stopUniversalGodModeLoop() -- Stop the Universal God Mode loop
                     end
                 end
             })
