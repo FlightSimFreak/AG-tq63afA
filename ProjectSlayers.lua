@@ -35,6 +35,7 @@
     local getDemonInfo
     local autoCollectChestToggle
     local stopTeleportButton
+    local npcTeleport
 
     local joinMainMenu
     local joinMap1
@@ -401,7 +402,7 @@
             ConfigurationSaving = {
                 Enabled = false,
                 FolderName = nil, -- Create a custom folder for your hub/game
-                FileName = "Big Hub"
+                FileName = "Configurations"
             },
             Discord = {
                 Enabled = false,
@@ -608,9 +609,7 @@
                 PlaceholderText = "Add Code Here",
                 RemoveTextAfterFocusLost = false,
                 Callback = function(Text)
-                    pcall(function()
-                        _G.Options.PrivateCode = (Text)
-                    end)
+                    _G.Options.PrivateCode = (Text)
                 end,
             })
                 joinPS = Server:CreateDropdown({
@@ -655,62 +654,20 @@
                     Rayfield:Destroy()
                 end,
             })
-            
             end
 
-    local skill_module = require(game:GetService("ReplicatedStorage").Modules.Server["Skills_Modules_Handler"])
-
-    hookfunction(skill_module.Kick, function()
-        return nil
-    end);
-
-    local anti_cheat1 = LocalPlayer.PlayerScripts["Small_Scripts"]["Client_Global_utility"]
-    local anti_cheat2 = LocalPlayer.PlayerScripts["Small_Scripts"]["client_global_delete_script"]
-
-    hookfunction(anti_cheat1.GetPropertyChangedSignal, function()
-        return
-    end)
-
-    hookfunction(anti_cheat2.GetPropertyChangedSignal, function()
-        return
-    end)
-
-    anti_cheat1.Disabled = true
-    anti_cheat2.Disabled = true
-
-    local Namecall
-    Namecall = hookmetamethod(game, '__namecall', function(self, ...)
-        local Args = {...}
-        local method = getnamecallmethod()
-        
-        if method == 'FireServer' and string.find(self.Name, 'mod') then 
-            return 
-        end
-        
-        if method == 'InvokeServer' and self.Name == 'reporthackerasdasd' then 
-            return 
-        end
-        
-        if method == 'FireServer' and self.Name == 'To_Server_commends' then 
-            return
-        end
-        
-        if method:lower() == 'kick' then 
-            return 
-        end
-        
-        return Namecall(self, ...)
-    end)
+   LocalPlayer.PlayerScripts["Small_Scripts"]["Client_Global_utility"].Disabled = true
+   LocalPlayer.PlayerScripts["Small_Scripts"]["client_global_delete_script"].Disabled = true
 
     local hook
     hook = hookmetamethod(game, "__namecall", function(self, ...)
-    args = {...}
-
-    if getnamecallmethod() == "FireServer" and #args == 2 and type(args[1]) == "boolean" then
-        return task.wait(9e9)
-    end
-
-    return hook(self, ...)
+       args = {...}
+    
+       if getnamecallmethod() == "FireServer" and #args == 2 and type(args[1]) == "boolean" then
+           return task.wait(9e9)
+       end
+    
+       return hook(self, ...)
     end)
 
             -- [Map 2]
@@ -1124,7 +1081,7 @@
 
             -- [Teleport Section]
             local Teleport = Window:CreateTab("Teleport")
-            local TeleportSection = Teleport:CreateSection("Teleport")
+            local TeleportSection = Teleport:CreateSection("Main Teleport")
             
             local teleportOptions = {
                 ["Nomay Village"] = {22675.3963009, "Nomay Village"},
@@ -1176,43 +1133,41 @@
                     }
                     ReplicatedStorage:WaitForChild("teleport_player_to_location_for_map_tang"):InvokeServer(unpack(args))
                 end,
-            })            
+            })    
 
-                        --[Server]
-                        local Server = Window:CreateTab("Server")
-                        local ServerSection = Server:CreateSection("Main Options")
+            local ServerSection = Teleport:CreateSection("Server Options")
             
-                        joinMainMenu= Server:CreateButton({
-                            Name = "Join Main Menu",
-                            Callback = function ()
-                                game:GetService("TeleportService"):Teleport(5956785391, LocalPlayer)
-                            end,
-                        })
-                        joinMap1 = Server:CreateButton({
-                            Name = "Join Map 1",
-                            Callback = function ()
-                                game:GetService("TeleportService"):Teleport(6152116144, LocalPlayer)
-                            end,
-                        })
-                        joinMap2 = Server:CreateButton({
-                            Name = "Join Map 2",
-                            Callback = function ()
-                                game:GetService("TeleportService"):Teleport(13881804983, LocalPlayer)
-                            end,
-                        })
-                        joinHub = Server:CreateButton({
-                            Name = "Join HUB",
-                            Callback = function ()
-                                game:GetService("TeleportService"):Teleport(9321822839, LocalPlayer)
-                            end
-                        })
-                        local SettingsSection = Server:CreateSection("Server Options")
-                        rejoinServer = Server:CreateButton({
-                            Name = "Rejoin Server",
-                            Callback = function ()
-                                game:GetService("TeleportService"):Teleport(game.PlaceId, LocalPlayer)
-                            end,
-                        })
+            joinMainMenu= Teleport:CreateButton({
+                Name = "Join Main Menu",
+                Callback = function ()
+                    game:GetService("TeleportService"):Teleport(5956785391, LocalPlayer)
+                end,
+            })
+            joinMap1 = Teleport:CreateButton({
+                Name = "Join Map 1",
+                Callback = function ()
+                    game:GetService("TeleportService"):Teleport(6152116144, LocalPlayer)
+                end,
+            })
+            joinMap2 = Teleport:CreateButton({
+                Name = "Join Map 2",
+                Callback = function ()
+                    game:GetService("TeleportService"):Teleport(13881804983, LocalPlayer)
+                end,
+            })
+            joinHub = Teleport:CreateButton({
+                Name = "Join HUB",
+                Callback = function ()
+                    game:GetService("TeleportService"):Teleport(9321822839, LocalPlayer)
+                end
+            })
+            rejoinServer = Teleport:CreateButton({
+                Name = "Rejoin Server",
+                Callback = function ()
+                    game:GetService("TeleportService"):Teleport(game.PlaceId, LocalPlayer)
+                end,
+            })
+            
             
             -- [GUI SETTINGS]
             local Settings = Window:CreateTab("Settings")
@@ -1814,42 +1769,38 @@
                     stopTweenTeleport()
                 end
             })
-
-                        --[Server]
-                        local Server = Window:CreateTab("Server")
-                        local ServerSection = Server:CreateSection("Main Options")
+            local ServerSection = Teleport:CreateSection("Server Options")
             
-                        joinMainMenu= Server:CreateButton({
-                            Name = "Join Main Menu",
-                            Callback = function ()
-                                game:GetService("TeleportService"):Teleport(5956785391, LocalPlayer)
-                            end,
-                        })
-                        joinMap1 = Server:CreateButton({
-                            Name = "Join Map 1",
-                            Callback = function ()
-                                game:GetService("TeleportService"):Teleport(6152116144, LocalPlayer)
-                            end,
-                        })
-                        joinMap2 = Server:CreateButton({
-                            Name = "Join Map 2",
-                            Callback = function ()
-                                game:GetService("TeleportService"):Teleport(13881804983, LocalPlayer)
-                            end,
-                        })
-                        joinHub = Server:CreateButton({
-                            Name = "Join HUB",
-                            Callback = function ()
-                                game:GetService("TeleportService"):Teleport(9321822839, LocalPlayer)
-                            end
-                        })
-                        local SettingsSection = Server:CreateSection("Server Options")
-                        rejoinServer = Server:CreateButton({
-                            Name = "Rejoin Server",
-                            Callback = function ()
-                                game:GetService("TeleportService"):Teleport(game.PlaceId, LocalPlayer)
-                            end,
-                        })
+            joinMainMenu= Teleport:CreateButton({
+                Name = "Join Main Menu",
+                Callback = function ()
+                    game:GetService("TeleportService"):Teleport(5956785391, LocalPlayer)
+                end,
+            })
+            joinMap1 = Teleport:CreateButton({
+                Name = "Join Map 1",
+                Callback = function ()
+                    game:GetService("TeleportService"):Teleport(6152116144, LocalPlayer)
+                end,
+            })
+            joinMap2 = Teleport:CreateButton({
+                Name = "Join Map 2",
+                Callback = function ()
+                    game:GetService("TeleportService"):Teleport(13881804983, LocalPlayer)
+                end,
+            })
+            joinHub = Teleport:CreateButton({
+                Name = "Join HUB",
+                Callback = function ()
+                    game:GetService("TeleportService"):Teleport(9321822839, LocalPlayer)
+                end
+            })
+            rejoinServer = Teleport:CreateButton({
+                Name = "Rejoin Server",
+                Callback = function ()
+                    game:GetService("TeleportService"):Teleport(game.PlaceId, LocalPlayer)
+                end,
+            })
 
         -- [GUI SETTINGS]
         local Settings = Window:CreateTab("Settings")
