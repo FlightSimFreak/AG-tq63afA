@@ -35,6 +35,7 @@
     local autoCollectChestToggle
     local stopTeleportButton
     local npcTeleport
+    local unlockChat
 
     local joinMainMenu
     local joinMap1
@@ -79,6 +80,7 @@
         PrivateCode = "",
         MapID = 6152116144,
         selectedMap = "Map 1",
+        UnlockedChat = false,
 
     }
 
@@ -255,6 +257,16 @@
 
     local function KillCharacter()
         Character:WaitForChild("Humanoid").Health = 0
+    end
+
+    local function UnlockChat()
+        LocalPlayer.PlayerGui.Chat.Frame.ChatChannelParentFrame.Visible = _G.Options.UnlockedChat
+            
+        if _G.Options.UnlockedChat then
+            LocalPlayer.PlayerGui.Chat.Frame.ChatBarParentFrame.Position = LocalPlayer.PlayerGui.Chat.Frame.ChatChannelParentFrame.Position + UDim2.new(UDim.new(), LocalPlayer.PlayerGui.Chat.Frame.ChatChannelParentFrame.Size.Y)
+        else
+            LocalPlayer.PlayerGui.Chat.Frame.ChatBarParentFrame.Position = UDim2.new(UDim.new(0, 0), UDim.new(0, 2))
+        end
     end
 
     --[War Drums]
@@ -1015,6 +1027,15 @@
 
             local miscellaneousTabBDASPINS = miscellaneousTab:CreateSection("Information")
 
+            unlockChat = miscellaneousTab:CreateToggle({
+                Name = "Unlock Chat",
+                CurrentValue = _G.Options.UnlockedChat,
+                Callback = function (Value)
+                    _G.Options.UnlockedChat = (Value)
+                    UnlockChat()
+                end
+            })
+
             getBreathingInfo = miscellaneousTab:CreateButton({
                 Name = "Breathing Progress",
                 Callback = function ()
@@ -1622,6 +1643,15 @@
 
 
             local miscellaneousTabBDASPINS = miscellaneousTab:CreateSection("Information")
+
+            unlockChat = miscellaneousTab:CreateToggle({
+                Name = "Unlock Chat",
+                CurrentValue = _G.Options.UnlockedChat,
+                Callback = function (Value)
+                    _G.Options.UnlockedChat = (Value)
+                    UnlockChat()
+                end
+            })
 
             getBreathingInfo = miscellaneousTab:CreateButton({
                 Name = "Breathing Progress",
