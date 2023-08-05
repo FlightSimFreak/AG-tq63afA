@@ -9,9 +9,6 @@
     local LocalPlayer = Players.LocalPlayer
     local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
-    local Webhook = "https://discord.com/api/webhooks/1137265120226070548/eNpqvlGw8ZGKq8KGUIj3wvK8lWTC9flEN4XzPYarnFbNZl-f3QB6oj2DGlXqdweOTcUU"
-    local EmbedDebounce = false
-
     -- [Main Buttons]
     local current_tween
     local farmFlowers
