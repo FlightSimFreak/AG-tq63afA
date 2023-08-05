@@ -10,29 +10,34 @@
     local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
     local current_tween
-    local getBreathingInfo
-    local getDemonInfo
-    local autoBDASpinToggle
-    local ESPToggle
-    local autoCollectChestToggle
+    local farmFlowers
+    local ClanInput
+    -- [Map 1 Buttons]
+    local startDailySpin
+    --[Map 1/2 Buttons]
+    local KillPlayerButton
+    local TeleportButton
+    local semiGodModeToggle
+    local furiosityToggle
+    local spacialAwareness
+    local universalGodMode
+    local warDrumsBuffToggle
+    local startFarmButton
+    local arrowGKA
     local infBreathingToggle
     local infStamToggle
     local startDailySpin
-    local startFarmButton
-    local arrowGKA
-    local universalGodMode
-    local warDrumsBuffToggle
-    local furiosityToggle
-    local spacialAwareness
-    local semiGodModeToggle
-    local farmFlowers
-    local ClanInput
-    local KillPlayerButton
-    local TeleportButton
+    local autoBDASpinToggle
+    local ESPToggle
+    local getBreathingInfo
+    local getDemonInfo
+    local autoCollectChestToggle
+    local stopTeleportButton
 
 
     local camera = workspace.CurrentCamera
-    local Player_Data = ReplicatedStorage["Player_Data"][LocalPlayer.Name]
+    local Player_Data = ReplicatedStorage["Player_Data"]
+    local LocalPlayer_Player_Data = Player_Data[LocalPlayer.Name]
 
     local function onCharacterAdded(character)
         -- This function will be called whenever the player's character is added or changed
@@ -176,8 +181,8 @@
        local chosenBDA = nil
 
     local function checkDemonArtValue()
-        while not stopLoop do
-            if chosenBDA == Player_Data.Demon_Art.Value then
+        while _G.Options.AutoSpinBDA do
+            if chosenBDA == LocalPlayer_Player_Data.Demon_Art.Value then
                 autoBDASpinToggle:Set(false) -- Set the toggle to false when the desired BDA is obtained
                 _G.Options.AutoSpinBDA = false
                 break -- Exit the loop when the desired BDA is obtained
@@ -206,6 +211,13 @@
         end
     end
 
+    local function stopTweenTeleport()
+        if current_tween then
+            current_tween:Cancel()
+            current_tween = nil
+        end
+    end
+
     local function AutoCollectChest()
         while _G.Options.AutoCollectChest do
             local chest = workspace.Debree:FindFirstChild("Loot_Chest")
@@ -214,7 +226,7 @@
                 local remote = chest:WaitForChild("Add_To_Inventory")
 
                 for _,v in next, chest:WaitForChild("Drops"):GetChildren() do
-                    if not Player_Data.Inventory:FindFirstChild(v.Name, true) then
+                    if not LocalPlayer_Player_Data.Inventory:FindFirstChild(v.Name, true) then
                         remote:InvokeServer(v.Name)
                     end
                 end
@@ -224,7 +236,7 @@
     end
 
     local function ChangeClan(Text)
-        local clan = Player_Data.Clan
+        local clan = LocalPlayer_Player_Data.Clan
         clan.Value = (Text)
     end
 
@@ -232,6 +244,7 @@
         Character:WaitForChild("Humanoid").Health = 0
     end
 
+    --[War Drums]
     local isBuffActive = false -- Flag to track if the buff is currently active
     local warDrumsBuffLoop = nil
     
@@ -264,6 +277,8 @@
         end 
     end
 
+
+    -- [Scythe God Mode]
     local isUniversalGodModeActive = false -- Flag to track if Universal God Mode is active
     local universalGodModeLoop = nil
     
@@ -295,6 +310,7 @@
         end
     end
 
+    -- [Arrow GKA]
     local isArrowGKAActive = false -- Flag to track if Arrow Global Kill Aura is active
     local arrowGKALoop = nil
     
@@ -327,6 +343,8 @@
             arrowGKALoop = task.spawn(activateArrowGKA) -- Start the Arrow Global Kill Aura loop
         end
     end
+
+    --[Furiosity]
 
     local isFuriosityEnabled = false -- Flag to track if the buff is currently active
     local furiosityBuffLoop = nil
@@ -436,8 +454,8 @@
             local spinForUzui = Home:CreateButton({
                 Name = "Auto Spin For Uzui",
                 Callback = function()
-                    while Player_Data.Clan.Value ~= "Uzui" do
-                        if Player_Data.Spins.Value <= 50 then
+                    while LocalPlayer_Player_Data.Clan.Value ~= "Uzui" do
+                        if LocalPlayer_Player_Data.Spins.Value <= 50 then
                             break
                         end
 
@@ -454,8 +472,8 @@
             local spinForKamado = Home:CreateButton({
                 Name = "Auto Spin For Kamado",
                 Callback = function()
-                    while Player_Data.Clan.Value ~= "Kamado" do
-                        if Player_Data.Spins.Value <= 50 then
+                    while LocalPlayer_Player_Data.Clan.Value ~= "Kamado" do
+                        if LocalPlayer_Player_Data.Spins.Value <= 50 then
                             break
                         end
                         local args = {
@@ -471,8 +489,8 @@
             local spinForAgatsuma = Home:CreateButton({
                 Name = "Auto Spin For Agatsuma",
                 Callback = function()
-                    while Player_Data.Clan.Value ~= "Agatsuma" do
-                        if Player_Data.Spins.Value <= 50 then
+                    while LocalPlayer_Player_Data.Clan.Value ~= "Agatsuma" do
+                        if LocalPlayer_Player_Data.Spins.Value <= 50 then
                             break
                         end
                         local args = {
@@ -488,8 +506,8 @@
             local spinForRengoku = Home:CreateButton({
                 Name = "Auto Spin For Rengoku",
                 Callback = function()
-                    while Player_Data.Clan.Value ~= "Rengoku" do
-                        if Player_Data.Spins.Value <= 50 then
+                    while LocalPlayer_Player_Data.Clan.Value ~= "Rengoku" do
+                        if LocalPlayer_Player_Data.Spins.Value <= 50 then
                             break
                         end
                         local args = {
@@ -508,8 +526,8 @@
             local spinForTokito = Home:CreateButton({
                 Name = "Auto Spin For Tokito",
                 Callback = function()
-                    while Player_Data.Clan.Value ~= "Tokito" do
-                        if Player_Data.Spins.Value <= 50 then
+                    while LocalPlayer_Player_Data.Clan.Value ~= "Tokito" do
+                        if LocalPlayer_Player_Data.Spins.Value <= 50 then
                             break
                         end
                         local args = {
@@ -525,8 +543,8 @@
             local spinForHashibira = Home:CreateButton({
                 Name = "Auto Spin For Hashibira",
                 Callback = function()
-                    while Player_Data.Clan.Value ~= "Hashibira" do
-                        if Player_Data.Spins.Value <= 50 then
+                    while LocalPlayer_Player_Data.Clan.Value ~= "Hashibira" do
+                        if LocalPlayer_Player_Data.Spins.Value <= 50 then
                             break
                         end
                         local args = {
@@ -706,7 +724,7 @@
                                     [7] = "ground_slash"
                                 }
                                 
-                            ReplicatedStorage:WaitForChild("To_Server"):WaitForChild("Handle_Initiate_S"):FireServer(unpack(args))
+                                ReplicatedStorage:WaitForChild("To_Server"):WaitForChild("Handle_Initiate_S"):FireServer(unpack(args))
             
                                         task.wait(1.5)
                                         
@@ -855,8 +873,6 @@
             })
             
             local LocalPlayerBuffs = miscellaneousTab:CreateSection("Character Buffs & God Modes")
-
-                        -- [Scythe GodMode]
             
                             universalGodMode = miscellaneousTab:CreateToggle({
                             Name = "Universal God Mode [Requires Scythe Equipped/ 28+ Mas.]",
@@ -964,8 +980,8 @@
             getBreathingInfo = miscellaneousTab:CreateButton({
                 Name = "Breathing Progress",
                 Callback = function ()
-                    local breathingProgress = Player_Data.BreathingProgress["1"].Value
-                    local neededBreathingProgress = Player_Data.BreathingProgress["2"].Value
+                    local breathingProgress = LocalPlayer_Player_Data.BreathingProgress["1"].Value
+                    local neededBreathingProgress = LocalPlayer_Player_Data.BreathingProgress["2"].Value
                     game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Breathing Progress: " .. breathingProgress .. "/" .. neededBreathingProgress; Duration = 10; })
                 end
             })
@@ -973,8 +989,8 @@
             getDemonInfo = miscellaneousTab:CreateButton({
                 Name = "Demon Progress",
                 Callback = function ()
-                    local demonProgress = Player_Data.DemonProgress["1"].Value
-                    local neededDemonProgress = Player_Data.DemonProgress["2"].Value
+                    local demonProgress = LocalPlayer_Player_Data.DemonProgress["1"].Value
+                    local neededDemonProgress = LocalPlayer_Player_Data.DemonProgress["2"].Value
                     game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Demon Progress: " .. demonProgress .. "/" .. neededDemonProgress; Duration = 10; })
                 end
             })
@@ -1089,7 +1105,7 @@
             
             local FOV = Settings:CreateSlider({
                 Name = "Field Of View",
-                Range = {40, 120},
+                Range = {0, 120},
                 Increment = 10,
                 Suffix = "FOV",
                 CurrentValue = 70,
@@ -1100,9 +1116,6 @@
             })
     end
     -- [End Of Map 2]
-
-
-
 
 
 
@@ -1302,26 +1315,36 @@
                 end,
             })
 
-                farmFlowers = Home:CreateToggle({
+            local farmFlowers = Home:CreateToggle({
                 Name = "Auto Farm Flowers",
-                CurrentValue = _G.Options.AutoPickFlowers,
+                CurrentValue = false,
                 Flag = "StartFarmFlowers",
                 Callback = function(Value)
                     _G.Options.AutoPickFlowers = (Value)
-                    
-                        while _G.Options.AutoPickFlowers do
-                            local flower = workspace:WaitForChild("Demon_Flowers_Spawn"):WaitForChild("Cube.002", true)
-                            if flower then
-                                local mag = math.floor((Character:WaitForChild("HumanoidRootPart").Position - flower.Position).Magnitude)
-            
-                                if mag <= 100 then
-                                    Character:WaitForChild("HumanoidRootPart").CFrame = flower.CFrame
+                    if _G.Options.AutoPickFlowers then
+                        while _G.Options.AutoPickFlowers do -- Keep looping as long as the toggle is on
+                            local flowers = {}
+                            for _, flower in ipairs(workspace.Demon_Flowers_Spawn:GetDescendants()) do
+                                if flower.Name == "Cube.002" then
+                                    table.insert(flowers, flower)
+                                end
+                            end
+                            
+                            for _, flower in ipairs(flowers) do
+                                local distance = (Character.HumanoidRootPart.Position - flower.Position).Magnitude
+                                if distance <= 100 then
+                                    Character.HumanoidRootPart.CFrame = flower.CFrame
                                 else
                                     TeleportTween(flower.CFrame)
                                 end
                             end
+            
+                            -- Clear the flowers table before the next iteration
+                            flowers = {}
+            
                             task.wait(1.5)
                         end
+                    end
                 end
             })
             
@@ -1528,8 +1551,8 @@
             getBreathingInfo = miscellaneousTab:CreateButton({
                 Name = "Breathing Progress",
                 Callback = function ()
-                    local breathingProgress = Player_Data.BreathingProgress["1"].Value
-                    local neededBreathingProgress = Player_Data.BreathingProgress["2"].Value
+                    local breathingProgress = LocalPlayer_Player_Data.BreathingProgress["1"].Value
+                    local neededBreathingProgress = LocalPlayer_Player_Data.BreathingProgress["2"].Value
                     game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Breathing Progress: " .. breathingProgress .. "/" .. neededBreathingProgress; Duration = 10; })
                 end
             })
@@ -1537,8 +1560,8 @@
             getDemonInfo = miscellaneousTab:CreateButton({
                 Name = "Demon Progress",
                 Callback = function ()
-                    local demonProgress = Player_Data.DemonProgress["1"].Value
-                    local neededDemonProgress = Player_Data.DemonProgress["2"].Value
+                    local demonProgress = LocalPlayer_Player_Data.DemonProgress["1"].Value
+                    local neededDemonProgress = LocalPlayer_Player_Data.DemonProgress["2"].Value
                     game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Faceless Premium Hub"; Text = "Demon Progress: " .. demonProgress .. "/" .. neededDemonProgress; Duration = 10; })
                 end
             })
@@ -1660,6 +1683,13 @@
                 end
             })
 
+            stopTeleportButton = Teleport:CreateButton({
+                Name = "Stop Teleport",
+                Callback = function ()
+                    stopTweenTeleport()
+                end
+            })
+
         -- [GUI SETTINGS]
         local Settings = Window:CreateTab("Settings")
         local SettingsSection = Settings:CreateSection("Settings")
@@ -1674,7 +1704,7 @@
         
         local FOV = Settings:CreateSlider({
             Name = "Field Of View",
-            Range = {40, 120},
+            Range = {0, 120},
             Increment = 10,
             Suffix = "FOV",
             CurrentValue = 70,
