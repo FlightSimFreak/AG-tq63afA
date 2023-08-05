@@ -1,5 +1,3 @@
-    local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-
     local ReplicatedStorage = game:GetService("ReplicatedStorage")
     local Players = game:GetService("Players")
     local RunService = game:GetService("RunService")
@@ -45,7 +43,6 @@
     local joinHub
     local rejoinServer
 
-
     local camera = _workspace.CurrentCamera
     local Player_Data = ReplicatedStorage["Player_Data"]
     local LocalPlayer_Player_Data = Player_Data[LocalPlayer.Name]
@@ -65,7 +62,7 @@
     LocalPlayer.CharacterRemoving:Connect(onCharacterRemoved)
 
     _G.Options ={
-        TweenSpeed = 240,
+        TweenSpeed = 300,
         infstam = false,
         infbreath = false,
         AutoPickFlowers = false,
@@ -274,25 +271,23 @@
         end
     end
     
-    local function stopWarDrumsBuffLoop()
-        if warDrumsBuffLoop then
-            isBuffActive = false -- Stop the loop by setting the flag to false
-            task.wait() -- Yield the current thread so the loop can finish
-            local args = {
-                [1] = false
-            }
-            ReplicatedStorage.Remotes.war_Drums_remote:FireServer(unpack(args))
-            warDrumsBuffLoop = nil
+    local function toggleWarDrumsBuffLoop(activate)
+        if activate then
+            if not isBuffActive then
+                isBuffActive = true
+                warDrumsBuffLoop = task.spawn(activateWarDrumsBuff) -- Start the buff activation loop
+            end
+        else
+            if isBuffActive then
+                local args = {
+                    [1] = false
+                }
+                ReplicatedStorage.Remotes.war_Drums_remote:FireServer(unpack(args))
+                isBuffActive = false -- Set the flag to false to stop the loop gracefully
+            end
         end
     end
     
-    local function startWarDrumsBuffLoop()
-        if not warDrumsBuffLoop then
-            isBuffActive = true -- Set the flag to true to start the loop
-            warDrumsBuffLoop = task.spawn(activateWarDrumsBuff) -- Start the buff activation loop
-        end 
-    end
-
 
     -- [Scythe God Mode]
     local isUniversalGodModeActive = false -- Flag to track if Universal God Mode is active
@@ -306,25 +301,23 @@
                 [3] = "scythe_asteroid_reap",
                 [4] = 1
             }
-            ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("To_Server"):WaitForChild("Handle_Initiate_S"):FireServer(unpack(args))
+            ReplicatedStorage.Remotes.To_Server.Handle_Initiate_S:FireServer(unpack(args))
             task.wait(.5)
         end
     end
     
-    local function stopUniversalGodModeLoop()
-        if universalGodModeLoop then
-            isUniversalGodModeActive = false -- Stop the loop by setting the flag to false
-            task.wait() -- Yield the current thread so the loop can finish
-            universalGodModeLoop = nil
+    local function toggleUniversalGodModeLoop(activate)
+        if activate then
+            if not isUniversalGodModeActive then
+                isUniversalGodModeActive = true
+                universalGodModeLoop = task.spawn(activateUniversalGodMode) -- Start the Universal God Mode loop
+            end
+        else
+            if isUniversalGodModeActive then
+                isUniversalGodModeActive = false -- Set the flag to false to stop the loop gracefully
+            end
         end
-    end
-    
-    local function startUniversalGodModeLoop()
-        if not universalGodModeLoop then
-            isUniversalGodModeActive = true -- Set the flag to true to start the loop
-            universalGodModeLoop = task.spawn(activateUniversalGodMode) -- Start the Universal God Mode loop
-        end
-    end
+    end    
 
     -- [Arrow GKA]
     local isArrowGKAActive = false -- Flag to track if Arrow Global Kill Aura is active
@@ -375,24 +368,25 @@
         end
     end
     
-    local function stopFuriosityBuffLoop()
-        if furiosityBuffLoop then
-            isFuriosityEnabled = false -- Stop the loop by setting the flag to false
-            task.wait() -- Yield the current thread so the loop can finish
-            local args = {
-                [1] = false
-            }
-            ReplicatedStorage.Remotes.clan_furiosity_add:FireServer(unpack(args))
-            furiosityBuffLoop = nil
+    local function toggleFuriosityBuffLoop(activate)
+        if activate then
+            if not isFuriosityEnabled then
+                isFuriosityEnabled = true
+                furiosityBuffLoop = task.spawn(activateFuriosityBuff) -- Start the Furiosity Buff activation loop
+            end
+        else
+            if isFuriosityEnabled then
+                local args = {
+                    [1] = false
+                }
+                ReplicatedStorage.Remotes.clan_furiosity_add:FireServer(unpack(args))
+                isFuriosityEnabled = false -- Set the flag to false to stop the loop gracefully
+            end
         end
-    end
-    
-    local function startFuriosityBuffLoop()
-        if not furiosityBuffLoop then
-            isFuriosityEnabled = true -- Set the flag to true to start the loop
-            furiosityBuffLoop = task.spawn(activateFuriosityBuff) -- Start the buff activation loop
-        end 
-    end
+    end   
+
+
+    local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
     -- Main Menu
     if game.PlaceId == 5956785391 then
@@ -614,7 +608,7 @@
                 end,
             })
                 joinPS = Server:CreateDropdown({
-                Name = "Choose Map",
+                Name = "Select Map",
                 Options = {"Map 1", "Ouwohana"},
                 CurrentOption = {_G.Options.selectedMap},
                 MultipleOptions = false,
@@ -918,18 +912,18 @@
             
             local LocalPlayerBuffs = miscellaneousTab:CreateSection("Character Buffs & God Modes")
             
-                            universalGodMode = miscellaneousTab:CreateToggle({
+                   universalGodMode = miscellaneousTab:CreateToggle({
                             Name = "Universal God Mode [Requires Scythe Equipped/ 28+ Mas.]",
                             CurrentValue = _G.Options.UniversalGodMode,
                             Callback = function(Value)
-                                _G.Options.UniversalGodMode = (Value)
-                                if _G.Options.UniversalGodMode then
-                                    startUniversalGodModeLoop() -- Start the Universal God Mode loop
-                                else
-                                    stopUniversalGodModeLoop() -- Stop the Universal God Mode loop
-                                end
-                            end
-                        })
+                            _G.Options.UniversalGodMode = (Value)
+                            if _G.Options.UniversalGodMode then
+                             toggleUniversalGodModeLoop(true)
+                            else
+                            toggleUniversalGodModeLoop(false)
+                             end
+                        end
+                    })
             
                 warDrumsBuffToggle = miscellaneousTab:CreateToggle({
                 Name = "Speed & Damage Buff [All Races]",
@@ -937,9 +931,9 @@
                 Callback = function (Value)
                     _G.Options.SpeedandDamageBuff = (Value)
                     if _G.Options.SpeedandDamageBuff then
-                        startWarDrumsBuffLoop() -- Start the buff loop
+                        toggleWarDrumsBuffLoop(true) -- Start the buff loop
                     else
-                        stopWarDrumsBuffLoop() -- Stop the buff loop
+                        toggleWarDrumsBuffLoop(false) -- Stop the buff loop
                     end
                 end
             })
@@ -950,9 +944,9 @@
                 Callback = function (Value)
                     _G.Options.Furiosity = (Value)
                     if _G.Options.Furiosity then
-                        startFuriosityBuffLoop() -- Start the buff loop
+                        toggleFuriosityBuffLoop(true)
                     else
-                        stopFuriosityBuffLoop() -- Stop the buff loop
+                        toggleFuriosityBuffLoop(false)
                     end
                 end
             })
@@ -1487,9 +1481,9 @@
                 Callback = function(Value)
                     _G.Options.UniversalGodMode = (Value)
                     if _G.Options.UniversalGodMode then
-                        startUniversalGodModeLoop() -- Start the Universal God Mode loop
+                    toggleUniversalGodModeLoop(true)
                     else
-                        stopUniversalGodModeLoop() -- Stop the Universal God Mode loop
+                    toggleUniversalGodModeLoop(false)
                     end
                 end
             })
@@ -1500,9 +1494,9 @@
                 Callback = function (Value)
                     _G.Options.SpeedandDamageBuff = (Value)
                     if _G.Options.SpeedandDamageBuff then
-                        startWarDrumsBuffLoop() -- Start the buff loop
+                        toggleWarDrumsBuffLoop(true) -- Start the buff loop
                     else
-                        stopWarDrumsBuffLoop() -- Stop the buff loop
+                        toggleWarDrumsBuffLoop(false) -- Stop the buff loop
                     end
                 end
             })
@@ -1513,9 +1507,9 @@
                 Callback = function (Value)
                     _G.Options.Furiosity = (Value)
                     if _G.Options.Furiosity then
-                        startFuriosityBuffLoop() -- Start the buff loop
+                        toggleFuriosityBuffLoop(true)
                     else
-                        stopFuriosityBuffLoop() -- Stop the buff loop
+                        toggleFuriosityBuffLoop(false)
                     end
                 end
             })
@@ -1742,6 +1736,21 @@
                 end,
             })
 
+            stopTeleportButton = Teleport:CreateButton({
+                Name = "Stop Teleporting [Tween Teleport Only]",
+                Callback = function ()
+                    stopTweenTeleport()
+                end
+            })
+
+            local TeleportNPC = Teleport:CreateSection("Other Teleport")
+            local TesterPlace = Teleport:CreateButton({
+                Name = "Teleport to Tester Place",
+                Callback = function ()
+                    TeleportTween(CFrame.new(180.705414, 3.07499981, 166.806946, 0.997751355, 1.47003384e-12, -0.0670237914, -1.63727896e-12, 1, -2.44037993e-12, 0.0670237914, 2.544629e-12, 0.997751355))
+                end
+            })
+
             -- [NPC Teleport]
             local TeleportNPC = Teleport:CreateSection("Teleport NPC")
 
@@ -1764,12 +1773,6 @@
                 end
             })
 
-            stopTeleportButton = Teleport:CreateButton({
-                Name = "Stop Teleport",
-                Callback = function ()
-                    stopTweenTeleport()
-                end
-            })
             local ServerSection = Teleport:CreateSection("Server Options")
             
             joinMainMenu= Teleport:CreateButton({
