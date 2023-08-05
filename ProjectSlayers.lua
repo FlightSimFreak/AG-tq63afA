@@ -24,7 +24,6 @@
     local universalGodMode
     local warDrumsBuffToggle
     local startFarmButton
-    local arrowGKA
     local infBreathingToggle
     local infStamToggle
     local startDailySpin
@@ -70,7 +69,6 @@
         AutoCollectChest = false,
         SpeedandDamageBuff = false,
         SemiGodMode = false,
-        ArrowGKA = false,
         Furiosity = false,
         SpacialAwareness = false,
         UniversalGodMode = false,
@@ -330,40 +328,6 @@
             end
         end
     end    
-
-    -- [Arrow GKA]
-    local isArrowGKAActive = false -- Flag to track if Arrow Global Kill Aura is active
-    local arrowGKALoop = nil
-    
-    local function activateArrowGKA()
-        while isArrowGKAActive do
-            local args = {
-                [1] = "skil_ting_asd",
-                [2] = LocalPlayer,
-                [3] = "arrow_knock_back",
-                [4] = 5
-            }
-            
-        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("To_Server"):WaitForChild("Handle_Initiate_S"):FireServer(unpack(args))
-
-            task.wait(1)
-        end
-    end
-    
-    local function stopArrowGKALoop()
-        if arrowGKALoop then
-            isArrowGKAActive = false -- Stop the loop by setting the flag to false
-            task.wait() -- Yield the current thread so the loop can finish
-            arrowGKALoop = nil
-        end
-    end
-    
-    local function startArrowGKALoop()
-        if not arrowGKALoop then
-            isArrowGKAActive = true -- Set the flag to true to start the loop
-            arrowGKALoop = task.spawn(activateArrowGKA) -- Start the Arrow Global Kill Aura loop
-        end
-    end
 
     --[Furiosity]
 
@@ -883,25 +847,7 @@
                     end
                 end
             })
-            
-            -- [GKA]
-            local gkaTab = Window:CreateTab("GKA")
-            local gkaSection = gkaTab:CreateSection("Main Global Kill Aura")
-            
-            arrowGKA = gkaTab:CreateToggle({
-                Name = "Arrow Global Kill Aura [Requires Arrow BDA]",
-                CurrentValue = _G.Options.ArrowGKA,
-                Callback = function (Value)
-                    _G.Options.ArrowGKA = (Value)
-                    if _G.Options.ArrowGKA then
-                        startArrowGKALoop() -- Start the Arrow Global Kill Aura loop
-                    else
-                        stopArrowGKALoop() -- Stop the Arrow Global Kill Aura loop
-                    end
-                end
-            })
-            
-            
+                      
             -- [Miscellaneous]
             local miscellaneousTab = Window:CreateTab("Miscellaneous")
             local LocalPlayerMainSection = miscellaneousTab:CreateSection("Main Settings")
@@ -1449,23 +1395,6 @@
                     _G.Options.AutoCollectChest = (Value)
                     if _G.Options.AutoCollectChest then
                         AutoCollectChest()
-                    end
-                end
-            })
-            
-            -- [GKA]
-            local gkaTab = Window:CreateTab("GKA")
-            local gkaSection = gkaTab:CreateSection("Main Global Kill Aura")
-            
-                arrowGKA = gkaTab:CreateToggle({
-                Name = "Arrow Global Kill Aura [Requires Arrow BDA]",
-                CurrentValue = _G.Options.ArrowGKA,
-                Callback = function (Value)
-                    _G.Options.ArrowGKA = (Value)
-                    if _G.Options.ArrowGKA then
-                        startArrowGKALoop() -- Start the Arrow Global Kill Aura loop
-                    else
-                        stopArrowGKALoop() -- Stop the Arrow Global Kill Aura loop
                     end
                 end
             })
