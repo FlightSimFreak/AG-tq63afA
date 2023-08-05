@@ -192,6 +192,8 @@
                 [1] = "check_can_spin_demon_art"
             }
             ReplicatedStorage.Remotes.To_Server.Handle_Initiate_S_:InvokeServer(unpack(args))
+
+            task.wait(.1)
         end
     end
 
