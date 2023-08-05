@@ -4,6 +4,7 @@
     local Players = game:GetService("Players")
     local RunService = game:GetService("RunService")
     local UserInputService = game:GetService("UserInputService")
+    local _workspace = game:GetService("Workspace")
 
     local TweenService = game:GetService("TweenService")
     local LocalPlayer = Players.LocalPlayer
@@ -45,7 +46,7 @@
     local rejoinServer
 
 
-    local camera = workspace.CurrentCamera
+    local camera = _workspace.CurrentCamera
     local Player_Data = ReplicatedStorage["Player_Data"]
     local LocalPlayer_Player_Data = Player_Data[LocalPlayer.Name]
 
@@ -136,7 +137,7 @@
                    local position, onScreen = camera:WorldToViewportPoint(humanoidRootPart.Position)
                    local powerValue = Player_Data[player.Name].Power.Value
                    local artValue = Player_Data[player.Name].Demon_Art.Value
-                   local healthValue = workspace[player.Name].Humanoid.Health
+                   local healthValue = _workspace[player.Name].Humanoid.Health
    
                    local playerRace = Player_Data[player.Name].Race.Value
                    -- Calculate distance between LocalPlayer and the target player
@@ -199,7 +200,7 @@
                 autoBDASpinToggle:Set(false) -- Set the toggle to false when the desired BDA is obtained
                 _G.Options.AutoSpinBDA = false
                 break -- Exit the loop when the desired BDA is obtained
-            end
+            end;
             
             local args = {
                 [1] = "check_can_spin_demon_art"
@@ -235,7 +236,7 @@
 
     local function AutoCollectChest()
         while _G.Options.AutoCollectChest do
-            local chest = workspace.Debree:FindFirstChild("Loot_Chest")
+            local chest = _workspace.Debree:FindFirstChild("Loot_Chest")
             
             if chest and #chest:WaitForChild("Drops"):GetChildren() > 0 then
                 local remote = chest:WaitForChild("Add_To_Inventory")
@@ -472,7 +473,7 @@
                     while LocalPlayer_Player_Data.Clan.Value ~= "Uzui" do
                         if LocalPlayer_Player_Data.Spins.Value <= 50 then
                             break
-                        end
+                        end;
 
                         local args = {
                             [1] = "check_can_spin"
@@ -490,7 +491,7 @@
                     while LocalPlayer_Player_Data.Clan.Value ~= "Kamado" do
                         if LocalPlayer_Player_Data.Spins.Value <= 50 then
                             break
-                        end
+                        end;
                         local args = {
                             [1] = "check_can_spin"
                         }
@@ -507,7 +508,7 @@
                     while LocalPlayer_Player_Data.Clan.Value ~= "Agatsuma" do
                         if LocalPlayer_Player_Data.Spins.Value <= 50 then
                             break
-                        end
+                        end;
                         local args = {
                             [1] = "check_can_spin"
                         }
@@ -524,7 +525,7 @@
                     while LocalPlayer_Player_Data.Clan.Value ~= "Rengoku" do
                         if LocalPlayer_Player_Data.Spins.Value <= 50 then
                             break
-                        end
+                        end;
                         local args = {
                             [1] = "check_can_spin"
                         }
@@ -544,7 +545,7 @@
                     while LocalPlayer_Player_Data.Clan.Value ~= "Tokito" do
                         if LocalPlayer_Player_Data.Spins.Value <= 50 then
                             break
-                        end
+                        end;
                         local args = {
                             [1] = "check_can_spin"
                         }
@@ -561,7 +562,7 @@
                     while LocalPlayer_Player_Data.Clan.Value ~= "Hashibira" do
                         if LocalPlayer_Player_Data.Spins.Value <= 50 then
                             break
-                        end
+                        end;
                         local args = {
                             [1] = "check_can_spin"
                         }
@@ -714,7 +715,7 @@
                                         local args = {
                                             [1] = "fist_combat",
                                             [2] = LocalPlayer,
-                                            [3] = workspace:WaitForChild(LocalPlayer.Name),
+                                            [3] = _workspace:WaitForChild(LocalPlayer.Name),
                                             [4] = Character.HumanoidRootPart,
                                             [5] = Character.Humanoid,
                                             [6] = 919,
@@ -760,7 +761,7 @@
                                     local args = {
                                     [1] = "Scythe_Combat_Slash",
                                     [2] = LocalPlayer,
-                                    [3] = workspace:WaitForChild(LocalPlayer.Name),
+                                    [3] = _workspace:WaitForChild(LocalPlayer.Name),
                                     [4] = Character.HumanoidRootPart,
                                     [5] = Character.Humanoid,
                                     [6] = 919,
@@ -1188,7 +1189,7 @@
                 CurrentValue = 70,
                 Flag = "FOVSlider",
                 Callback = function(Value)
-                workspace.Camera.FieldOfView = (Value)
+                _workspace.Camera.FieldOfView = (Value)
                 end,
             })
     end
@@ -1243,7 +1244,7 @@
                                         local args = {
                                             [1] = "fist_combat",
                                             [2] = LocalPlayer,
-                                            [3] = workspace:WaitForChild(LocalPlayer.Name),
+                                            [3] = _workspace:WaitForChild(LocalPlayer.Name),
                                             [4] = Character.HumanoidRootPart,
                                             [5] = Character.Humanoid,
                                             [6] = 919,
@@ -1289,7 +1290,7 @@
                                     local args = {
                                     [1] = "Scythe_Combat_Slash",
                                     [2] = LocalPlayer,
-                                    [3] = workspace:WaitForChild(LocalPlayer.Name),
+                                    [3] = _workspace:WaitForChild(LocalPlayer.Name),
                                     [4] = Character.HumanoidRootPart,
                                     [5] = Character.Humanoid,
                                     [6] = 919,
@@ -1401,7 +1402,7 @@
                     if _G.Options.AutoPickFlowers then
                         while _G.Options.AutoPickFlowers do -- Keep looping as long as the toggle is on
                             local flowers = {}
-                            for _, flower in ipairs(workspace.Demon_Flowers_Spawn:GetDescendants()) do
+                            for _, flower in ipairs(_workspace.Demon_Flowers_Spawn:GetDescendants()) do
                                 if flower.Name == "Cube.002" then
                                     table.insert(flowers, flower)
                                 end
@@ -1747,11 +1748,11 @@
             local muzanTeleport = Teleport:CreateButton({
                 Name = "Teleport to Muzan",
                 Callback = function()
-                    if not workspace:FindFirstChild("Muzan") then
+                    if not _workspace:FindFirstChild("Muzan") then
                         return
                     end
             
-                    TeleportTween(CFrame.new(workspace.Muzan.SpawnPos.Value))
+                    TeleportTween(CFrame.new(_workspace.Muzan.SpawnPos.Value))
                 end
             })
             
@@ -1824,7 +1825,7 @@
             Callback = function(Value)
             -- The function that takes place when the slider changes
             -- The variable (Value) is a number which correlates to the value the slider is currently at
-            workspace.Camera.FieldOfView = (Value)
+            _workspace.Camera.FieldOfView = (Value)
             end,
         })
     end
